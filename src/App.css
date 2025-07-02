@@ -1,38 +1,138 @@
-.App {
+#App {
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+  border: 2px solid #111111;
+  border-radius: 5%;
+}
+#score {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  /* font-size: 5%;  */
+  font-size: 15;
+  font-family: Arial, sans-serif;
+}
+#header {
+  position: absolute;
+  top: 0%;
+  height: 5%;
+  width: 100%;
+  font-size: 15;
+  background-color: rgb(206, 240, 240);
+}
+#footer {
+  position: absolute;
+  top: 90%;
+  height: 10%;
+  width: 100%;
+  font-size: 80%;
+  background-color: rgb(162, 134, 165);
+  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2);
+}
+#footerText {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  right: 20%;
+  height: 80%;
   text-align: center;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#main {
+  border-radius: 10px;
+  position: absolute;
+  top: 5%;
+  height: 85%;
+  width: 100%;
+  font-size: 15;
+  background-color: rgb(238, 240, 239);
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#leftArrowButton {
+  border-radius: 10px;
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  height: 80%;
+  width: 10%;
+  font-size: 120%;
+  background-color: rgb(238, 240, 239);
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+#leftArrowButton:hover {
+  /* background-color: rgb(228, 228, 228); */
+  /* border-radius: 30%; */
+  background-color: rgb(170, 212, 225);
+  /* transition: all 0.4s; */
 }
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
+/* click on button ainmation */
+@keyframes slide-right {
   from {
-    transform: rotate(0deg);
+    margin-left: 0px;
   }
+
+  50% {
+    margin-left: 110px;
+    opacity: 0.5;
+  }
+
   to {
-    transform: rotate(360deg);
+    margin-left: 200px;
+    opacity: 0.2;
   }
+}
+
+#leftArrowButton:active {
+  top: 15%;
+}
+#rightArrowButton {
+  border-radius: 10px;
+  position: absolute;
+  top: 10%;
+  right: 5%;
+  height: 80%;
+  width: 10%;
+  font-size: 120%;
+  background-color: rgb(238, 240, 239);
+}
+#rightArrowButton:hover {
+  background-color: rgb(170, 212, 225);
+}
+#rightArrowButton:active {
+  top: 15%;
+}
+.day {
+  display: grid;
+  width: 100%;
+  background-color: aliceblue;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+.dayName {
+  display: grid;
+  place-items: center;
+  background-color: rgb(209 206 209);
+}
+.hour {
+  text-align: center;
+  font-size: small;
+  color: #afabab;
+  background-color: #f8f8f8;
+  font-size: 100%;
+  display: grid;
+  place-items: center; /* Центрирование по обеим осям */
+}
+.hour:active {
+  border-radius: 10%;
+  background-color: rgb(238, 247, 219);
+}
+.hour:hover {
+  border-radius: 10%;
+  background-color: rgb(228, 251, 183);
+}
+.week {
+  width: 100%;
+  height: 100%;
+  display: flex;
 }
