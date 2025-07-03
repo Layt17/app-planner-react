@@ -1,4 +1,4 @@
-export const DayC = ({ dayName }) => {
+export const DayC = ({ dayName, digit }) => {
     const hours = [
     "00",
     "01",
@@ -24,11 +24,11 @@ export const DayC = ({ dayName }) => {
     "21",
     "22",
     "23",
-    "24",
   ];
 
-
-  let hoursDivs = [(<div key={'dayName' + dayName} className="dayName">{dayName}</div>)];
+  let digitDiv = (<div key={'dayName' + dayName + digit} className="dayName">{digit || 333}</div>)
+  let dayNameDiv = ((<div key={'dayName' + dayName} className="dayName">{dayName}</div>))
+  let hoursDivs = [digitDiv, dayNameDiv];
   for (let i = hours.length - 1; i >= 0; --i) {
     const h = hours[i];
     const divHour = (<div key={'hour' + h} className="hour">{h}</div>);
