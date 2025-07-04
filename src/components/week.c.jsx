@@ -28,7 +28,7 @@ export const WeekC = () => {
   );
   // push firstDay
   weekInfo.push({
-    dayName: new Date(cursorDay).toLocaleDateString(undefined, { weekday: 'short' }),
+    dayName: new Date(cursorDay).toLocaleDateString(state.local, { weekday: 'short' }),
     digit: new Date(cursorDay).getDate(),
   });
 
@@ -37,7 +37,7 @@ export const WeekC = () => {
     cursorDay = new Date(cursorDay).setDate(new Date(cursorDay).getDate() + 1);
     const date = new Date(cursorDay);
     weekInfo.push({
-      dayName: date.toLocaleDateString(undefined, { weekday: 'short' }),
+      dayName: date.toLocaleDateString(state.local, { weekday: 'short' }),
       digit: date.getDate(),
     });
   }
