@@ -1,3 +1,6 @@
 export const HeaderC = () => {
-  return <div id="header"></div>
+  const handleClick = () => {
+    console.log('clickOnHeader')
+  }
+  return <div id="header" onClick={handleClick()}></div>
 }
