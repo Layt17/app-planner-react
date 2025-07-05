@@ -1,13 +1,13 @@
 import "./App.css";
+import { useState } from "react";
+import { HeaderC } from "./components/header/header.c";
 import { MainC } from "./components/main.c";
 import { FooterC } from "./components/footer/footer.c";
-import { HeaderC } from "./components/header/header.c";
-import { useState } from "react";
 
-const local = "ru-RU";
-const currentDate = new Date();
+export const local = "ru-RU";
+export const currentDate = new Date();
 
-export const getWeekDays = (date) => {
+export const getWeekDays = (date?: Date) => {
   const dayPlaceDict = {
     понедельник: 1,
     вторник: 2,
@@ -22,8 +22,11 @@ export const getWeekDays = (date) => {
 
   const currentDay = date ?? new Date();
 
-  const cursorDayNumb =
-    dayPlaceDict[currentDay.toLocaleDateString(local, { weekday: "long" })];
+  const dayName = currentDay.toLocaleDateString(local, {
+    weekday: "long",
+  }) as keyof typeof dayPlaceDict;
+
+  const cursorDayNumb = dayPlaceDict[dayName];
 
   // get monday day
   let cursorDay = new Date(currentDay);
@@ -40,17 +43,22 @@ export const getWeekDays = (date) => {
 
   //gen next 6 days
   for (let i = 0; i < 6; i++) {
-    cursorDay = new Date(cursorDay).setDate(new Date(cursorDay).getDate() + 1);
-    const date = new Date(cursorDay);
+    cursorDay = new Date(
+      new Date(cursorDay).setDate(new Date(cursorDay).getDate() + 1)
+    );
     weekInfo.push({
-      dayName: date.toLocaleDateString(local, { weekday: "short" }),
-      digit: date.getDate(),
-      date,
+      dayName: cursorDay.toLocaleDateString(local, { weekday: "short" }),
+      digit: cursorDay.getDate(),
+      date: cursorDay,
     });
   }
 
   return weekInfo;
 };
+
+export const stateTest = {
+  test: 'JOPA',
+}
 
 export const state = {
   currentWeek: null,
@@ -64,7 +72,7 @@ export const state = {
   weekInfo: getWeekDays(),
 };
 
-export const updateState = (date, nextCursorDay) => {
+export const updateState = (date?: Date, nextCursorDay?: Date) => {
   state.d = date ?? state.d;
   state.month = date?.getMonth() || state.month;
   state.year = date?.getFullYear() || state.year;
@@ -74,15 +82,7 @@ export const updateState = (date, nextCursorDay) => {
   state.nextCursorDay = nextCursorDay ?? state.nextCursorDay;
 };
 
-export function useForceUpdate() {
-  const [value, setValue] = useState(0);
-
-  console.log('RERENDER');
-  return () => setValue((value) => value + 1);
-}
-
 function App() {
-  const [count, setCount] = useState(0);
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
@@ -92,5 +92,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
