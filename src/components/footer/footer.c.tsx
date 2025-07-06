@@ -12,7 +12,7 @@ export const FooterC = (props: Props & object) => {
     );
 
     state.weekInfo = getWeekDays(new Date(nextCursorDay));
-    props.updateStateApp(state.weekInfo);
+    props.updateStateApp(state);
   };
 
   const handleClickRight = () => {
@@ -23,7 +23,7 @@ export const FooterC = (props: Props & object) => {
     );
 
     state.weekInfo = getWeekDays(new Date(nextCursorDay));
-    props.updateStateApp(state.weekInfo);
+    props.updateStateApp(state);
   };
 
   const firstDayStr = `${state.weekInfo[0].date.getMonth()}.${
