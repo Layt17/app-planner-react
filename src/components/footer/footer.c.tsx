@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getWeekDays, state, stateTest, updateState } from "../../App";
+import { getWeekDays, state, updateState } from "../../App";
 
 export const FooterC = () => {
   const [stateWeek, setStateWeek] = useState(state.weekInfo);

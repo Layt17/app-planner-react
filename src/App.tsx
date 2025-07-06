@@ -56,9 +56,6 @@ export const getWeekDays = (date?: Date) => {
   return weekInfo;
 };
 
-export const stateTest = {
-  test: 'JOPA',
-}
 
 export const state = {
   currentWeek: null,
