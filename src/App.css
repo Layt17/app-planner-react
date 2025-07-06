@@ -9,6 +9,7 @@
   border: 2px solid #111111;
   border-radius: 5%;
 }
+
 #score {
   position: absolute;
   top: 5%;
@@ -29,7 +30,8 @@
 }
 #footer {
   position: absolute;
-  top: 90%;
+  /* top: 90%; */
+  bottom: 0;
   height: 10%;
   width: 100%;
   font-size: 80%;
@@ -52,7 +54,28 @@
   width: 100%;
   font-size: 15;
   background-color: rgb(238, 240, 239);
+  transform: translateX(-150%);
+  animation: leftSlide 1s forwards;
 }
+
+@keyframes leftSlide {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rightSlide {
+  0% {
+    transform: translateX(150%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 #leftArrowButton {
   border-radius: 10px;
   position: absolute;
