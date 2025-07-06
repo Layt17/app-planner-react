@@ -80,12 +80,13 @@ export const updateState = (date?: Date, nextCursorDay?: Date) => {
 };
 
 function App() {
+  const [appState, updateStateApp] = useState(state);
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
       <HeaderC></HeaderC>
       <MainC></MainC>
-      <FooterC></FooterC>
+      <FooterC updateStateApp={updateStateApp}></FooterC>
     </div>
   );
 }

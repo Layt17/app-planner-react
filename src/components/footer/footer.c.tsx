@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { getWeekDays, state, updateState } from "../../App";
+import { getWeekDays, state } from "../../App";
 
-export const FooterC = () => {
+type Props = {
+  updateStateApp: (...args: any[]) => any;
+};
+export const FooterC = (props: Props & object) => {
   const [stateWeek, setStateWeek] = useState(state.weekInfo);
   const handleClickLeft = () => {
     const prevCursorDay = new Date(state.weekInfo[0].date);
@@ -12,9 +15,21 @@ export const FooterC = () => {
       prevCursorDay.getDate() - 1
     );
     console.log(new Date(nextCursorDay).toISOString());
-    // updateState(undefined, new Date(nextCursorDay));
 
     state.weekInfo = getWeekDays(new Date(nextCursorDay));
+    props.updateStateApp(state.weekInfo);
+    setStateWeek(getWeekDays(new Date(nextCursorDay)));
+  };
+
+  const handleClickRight = () => {
+    const prevCursorDay = new Date(state.weekInfo[6].date);
+
+    const nextCursorDay = new Date(prevCursorDay).setDate(
+      prevCursorDay.getDate() + 1
+    );
+
+    state.weekInfo = getWeekDays(new Date(nextCursorDay));
+    props.updateStateApp(state.weekInfo);
     setStateWeek(getWeekDays(new Date(nextCursorDay)));
   };
 
@@ -33,7 +48,7 @@ export const FooterC = () => {
       <button id="leftArrowButton" onClick={handleClickLeft}>
         🔙
       </button>
-      <button id="rightArrowButton">🔜</button>
+      <button id="rightArrowButton" onClick={handleClickRight}>🔜</button>
     </div>
   );
 };

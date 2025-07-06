@@ -24,6 +24,8 @@
   width: 100%;
   font-size: 15;
   background-color: rgb(206, 240, 240);
+  text-align: center;
+  place-items: center;
 }
 #footer {
   position: absolute;
