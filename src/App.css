@@ -152,7 +152,7 @@
   font-size: small;
   color: #afabab;
   background-color: #f8f8f8;
-  font-size: 100%;
+  font-size: 50%;
   display: grid;
   place-items: center; /* Центрирование по обеим осям */
 }
