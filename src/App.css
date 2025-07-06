@@ -54,6 +54,9 @@
   width: 100%;
   font-size: 15;
   background-color: rgb(238, 240, 239);
+}
+
+.leftSlide {
   transform: translateX(-150%);
   animation: leftSlide 1s forwards;
 }
@@ -63,8 +66,13 @@
     transform: translateX(-150%);
   }
   100% {
-    transform: translateY(0);
+    transform: translateX(0);
   }
+}
+
+.rightSlide {
+  transform: translateX(-150%);
+  animation: rightSlide 1s forwards;
 }
 
 @keyframes rightSlide {
@@ -72,7 +80,7 @@
     transform: translateX(150%);
   }
   100% {
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 

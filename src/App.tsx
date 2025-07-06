@@ -67,6 +67,7 @@ export const state = {
   local,
   nextCursorDay: currentDate,
   weekInfo: getWeekDays(),
+  mainAnimation: '',
 };
 
 export const updateState = (date?: Date, nextCursorDay?: Date) => {
