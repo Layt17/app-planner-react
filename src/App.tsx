@@ -82,6 +82,7 @@ export const updateState = (date?: Date, nextCursorDay?: Date) => {
 
 function App() {
   const [appState, updateStateApp] = useState(state);
+  console.log(window)
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
