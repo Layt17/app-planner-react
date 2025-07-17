@@ -3,6 +3,7 @@ import { useState } from "react";
 import { HeaderC } from "./components/header/header.c";
 import { MainC } from "./components/main.c";
 import { FooterC } from "./components/footer/footer.c";
+import { TgAppDataI } from "./interfaces/tg-web-app-data.interface";
 
 export const local = "ru-RU";
 export const currentDate = new Date();
@@ -56,7 +57,6 @@ export const getWeekDays = (date?: Date) => {
   return weekInfo;
 };
 
-
 export const state = {
   currentWeek: null,
   d: currentDate,
@@ -67,7 +67,7 @@ export const state = {
   local,
   nextCursorDay: currentDate,
   weekInfo: getWeekDays(),
-  mainAnimation: '',
+  mainAnimation: "",
 };
 
 export const updateState = (date?: Date, nextCursorDay?: Date) => {
@@ -82,11 +82,33 @@ export const updateState = (date?: Date, nextCursorDay?: Date) => {
 
 function App() {
   const [appState, updateStateApp] = useState(state);
-  console.log(window)
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const tgWebAppDataHash = new URLSearchParams(
+    hashParams.get("tgWebAppData") || ""
+  );
+  const {
+    username,
+    first_name: firstName,
+    last_name: lastName,
+    language_code: languageCode,
+    is_premium: isPremium
+  } = JSON.parse(tgWebAppDataHash.get("user") as string);
+
+  const userInfo: TgAppDataI = {
+    queryId: tgWebAppDataHash.get("query_id"),
+    user: {
+      username,
+      firstName,
+      lastName,
+      languageCode,
+      isPremium,
+    },
+  };
+
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
-      <HeaderC></HeaderC>
+      <HeaderC userInfo={userInfo}></HeaderC>
       <MainC></MainC>
       <FooterC updateStateApp={updateStateApp}></FooterC>
     </div>
