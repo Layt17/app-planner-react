@@ -169,3 +169,10 @@
   height: 100%;
   display: flex;
 }
+.busyHour {
+  background-color: #bcd5a0;
+  display: grid;
+  top: 0%;
+  left: 0%;
+  right: 90%;
+}

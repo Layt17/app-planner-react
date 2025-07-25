@@ -1,3 +1,5 @@
+import { state } from "../App";
+
 export const DayC = ({
   dayName,
   digit,
@@ -44,10 +46,21 @@ export const DayC = ({
   );
   let hoursDivs = [digitDiv, dayNameDiv];
   for (let i = hours.length - 1; i >= 0; --i) {
+
     const h = hours[i];
+
+    const hourActions = state.actionsDataOnCurrentWeek.filter((a) => {
+      return a.date.split("T")[1].split(":")[0] === h;
+    });
+
+    let className = 'hour';
+    // if (hourActions.length) {
+    //   className += ' busy'
+    // };
+
     const divHour = (
-      <div key={"hour" + h} className="hour">
-        {h}
+      <div key={"hour" + h} className={className}>
+        {hourActions.length ? <div className="busyHour"> V </div> : ''}{h}
       </div>
     );
     hoursDivs.push(divHour);

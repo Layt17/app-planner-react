@@ -1,9 +1,10 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HeaderC } from "./components/header/header.c";
 import { MainC } from "./components/main.c";
 import { FooterC } from "./components/footer/footer.c";
 import { TgAppDataI } from "./interfaces/tg-web-app-data.interface";
+import axios from "axios";
 
 export const local = "ru-RU";
 export const currentDate = new Date();
@@ -68,6 +69,7 @@ export const state = {
   nextCursorDay: currentDate,
   weekInfo: getWeekDays(),
   mainAnimation: "",
+  actionsDataOnCurrentWeek: [] as { date: string, name: string }[],
 };
 
 export const updateState = (date?: Date, nextCursorDay?: Date) => {
@@ -81,37 +83,47 @@ export const updateState = (date?: Date, nextCursorDay?: Date) => {
 };
 
 function App() {
-  const [appState, updateStateApp] = useState(state);
-  const hashParams = new URLSearchParams(window.location.hash.substring(1));
-  const tgWebAppDataHash = new URLSearchParams(
-    hashParams.get("tgWebAppData") || ""
-  );
-  const {
-    username,
-    first_name: firstName,
-    last_name: lastName,
-    language_code: languageCode,
-    is_premium: isPremium
-  } = JSON.parse(tgWebAppDataHash.get("user") as string);
+  const [appState, setAppState] = useState(state);
+  const [userInfo, setUserInfo] = useState<TgAppDataI | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const userInfo: TgAppDataI = {
-    queryId: tgWebAppDataHash.get("query_id"),
-    user: {
-      username,
-      firstName,
-      lastName,
-      languageCode,
-      isPremium,
-    },
-  };
+  useEffect(() => {
+    // Перенесите логику с window и асинхронные запросы сюда
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const tgWebAppDataHash = new URLSearchParams(hashParams.get("tgWebAppData") || "");
+    
+    const tgData = JSON.parse(tgWebAppDataHash.get("user") || "{}");
+    setUserInfo({
+      queryId: tgWebAppDataHash.get("query_id") || '',
+      user: {
+        username: tgData?.username || 'username',
+        firstName: tgData?.first_name || 'firstName',
+        lastName: tgData?.last_name || 'lastName',
+        languageCode: tgData?.language_code || 'language_code',
+        isPremium: tgData?.is_premium || false,
+      },
+    });
+
+    // Асинхронный запрос
+    axios.get("http://localhost:8000/api")
+      .then(response => {
+        state.actionsDataOnCurrentWeek = response.data;
+        setAppState(prev => ({ ...prev, actionsDataOnCurrentWeek: response.data }));
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
-      <HeaderC userInfo={userInfo}></HeaderC>
-      <MainC></MainC>
-      <FooterC updateStateApp={updateStateApp}></FooterC>
+      <HeaderC userInfo={userInfo!} />
+      <MainC />
+      <FooterC updateStateApp={setAppState} />
     </div>
   );
 }
+
 export default App;
