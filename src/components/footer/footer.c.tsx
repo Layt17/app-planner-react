@@ -1,4 +1,4 @@
-import { getWeekDays, state } from "../../App";
+import { getWeekDays, state, currentDate } from "../../App";
 
 type Props = {
   updateStateApp: (...args: any[]) => any;
@@ -28,17 +28,39 @@ export const FooterC = (props: Props & object) => {
     props.updateStateApp(state.weekInfo);
   };
 
-  const firstDayStr = `${state.weekInfo[0].date.getMonth()}.${
+  const handleClickToday = () => {
+    // Определить, в какую сторону анимировать
+    const currentFirstDay = state.weekInfo[0].date.getTime();
+    const todayFirstDay = getWeekDays(currentDate)[0].date.getTime();
+
+    if (todayFirstDay < currentFirstDay) {
+      state.mainAnimation = 'leftSlide';
+    } else if (todayFirstDay > currentFirstDay) {
+      state.mainAnimation = 'rightSlide';
+    } else {
+      state.mainAnimation = '';
+    }
+
+    state.weekInfo = getWeekDays(currentDate);
+    props.updateStateApp(state.weekInfo);
+  };
+
+  const firstDayStr = `${state.weekInfo[0].date.getMonth() + 1}.${
     state.weekInfo[0].digit
-  }`;
-  const lastDayStr = `${state.weekInfo[6].date.getMonth()}.${
+  }.${state.weekInfo[0].date.getFullYear()}`;
+  const lastDayStr = `${state.weekInfo[6].date.getMonth() + 1}.${
     state.weekInfo[6].digit
-  }`;
+  }.${state.weekInfo[6].date.getFullYear()}`;
 
   return (
     <div id="footer">
-      <div id="footerText">
-        {firstDayStr} - {lastDayStr}
+      <div id="footerDates">
+        <div id="footerText">
+          {firstDayStr} - {lastDayStr}
+        </div>
+        <button id="todayButton" onClick={handleClickToday}>
+          Сегодня
+        </button>
       </div>
       <button id="leftArrowButton" onClick={handleClickLeft}>
         🔙

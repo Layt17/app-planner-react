@@ -38,13 +38,48 @@
   background-color: rgb(162, 134, 165);
   box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2);
 }
-#footerText {
+#footerDates {
   position: absolute;
-  top: 10%;
+  top: 5%;
   left: 20%;
   right: 20%;
-  height: 80%;
-  text-align: center;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#footerText {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+#todayButton {
+  padding: 6px 16px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: rgb(162, 134, 165);
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#todayButton:hover {
+  background-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#todayButton:active {
+  transform: translateY(0);
 }
 #main {
   border-radius: 10px;
@@ -92,34 +127,22 @@
   height: 80%;
   width: 15%;
   font-size: 120%;
-  background-color: rgb(238, 240, 239);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
 #leftArrowButton:hover {
-  /* background-color: rgb(228, 228, 228); */
-  /* border-radius: 30%; */
-  background-color: rgb(170, 212, 225);
-  /* transition: all 0.4s; */
-}
-/* click on button ainmation */
-@keyframes slide-right {
-  from {
-    margin-left: 0px;
-  }
-
-  50% {
-    margin-left: 110px;
-    opacity: 0.5;
-  }
-
-  to {
-    margin-left: 200px;
-    opacity: 0.2;
-  }
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 #leftArrowButton:active {
-  top: 15%;
+  transform: scale(0.95);
 }
+
 #rightArrowButton {
   border-radius: 10px;
   position: absolute;
@@ -128,13 +151,20 @@
   height: 80%;
   width: 15%;
   font-size: 120%;
-  background-color: rgb(238, 240, 239);
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
 #rightArrowButton:hover {
-  background-color: rgb(170, 212, 225);
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
 #rightArrowButton:active {
-  top: 15%;
+  transform: scale(0.95);
 }
 .day {
   display: grid;
@@ -148,6 +178,7 @@
   background-color: rgb(209 206 209);
 }
 .hour {
+  box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.2);
   text-align: center;
   font-size: small;
   color: #afabab;
@@ -171,6 +202,7 @@
   display: flex;
 }
 .busyHour {
+  width: 50%;
   position: absolute;
   width: 6px;
   height: 6px;
@@ -398,7 +430,7 @@
 }
 
 .add-task-btn-header {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 50%;
@@ -454,7 +486,7 @@
 
 .task-input:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #4caf50;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
 }
 
@@ -465,7 +497,7 @@ textarea.task-input {
 .save-task-btn {
   width: 100%;
   padding: 12px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 5px;
@@ -496,7 +528,9 @@ textarea.task-input {
   cursor: pointer;
   padding: 5px;
   border-radius: 5px;
-  transition: background-color 0.2s, transform 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
 }
 
 .delete-task-btn:hover {
