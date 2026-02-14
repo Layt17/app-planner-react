@@ -154,7 +154,8 @@
   background-color: #f8f8f8;
   font-size: 50%;
   display: grid;
-  place-items: center; /* Центрирование по обеим осям */
+  place-items: center; /* Центрирование по обеям */
+  position: relative;
 }
 .hour:active {
   border-radius: 10%;
@@ -170,9 +171,217 @@
   display: flex;
 }
 .busyHour {
-  background-color: #bcd5a0;
-  display: grid;
-  top: 0%;
-  left: 0%;
-  right: 90%;
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background-color: #33cc33;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.busyHour:nth-child(1) {
+  top: 2px;
+  right: 2px;
+}
+
+.busyHour:nth-child(2) {
+  top: 2px;
+  right: 10px;
+}
+
+.busyHour:nth-child(3) {
+  top: 2px;
+  right: 18px;
+}
+
+.busyHourMore {
+  position: absolute;
+  top: 1px;
+  right: 24px;
+  font-size: 8px;
+  font-weight: bold;
+  color: #33cc33;
+}
+
+@keyframes slideDownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideUpFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes slideRightFadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-overlay.closing {
+  animation: fadeIn 0.3s ease-out reverse;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+  animation: slideDownFadeIn 0.4s ease-out;
+}
+
+.modal-content.slide-up {
+  animation: slideUpFadeOut 0.3s ease-in forwards;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-close:hover {
+  color: #000;
+}
+
+.modal-body {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.modal-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-body li {
+  padding: 10px;
+  background-color: #f5f5f5;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  color: #333;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.task-time {
+  font-weight: bold;
+  color: #666;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+
+.task-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 8px;
+  font-size: 16px;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.expand-btn:hover {
+  opacity: 1;
+}
+
+.modal-details {
+  max-width: 500px;
+  animation: slideRightFadeIn 0.4s ease-out;
+}
+
+.modal-details.slide-right {
+  animation: slideRightFadeOut 0.3s ease-in forwards;
+}
+
+.details-body {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.details-body p {
+  margin: 0;
+  line-height: 1.6;
+  color: #333;
 }
