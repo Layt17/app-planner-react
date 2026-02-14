@@ -8,10 +8,13 @@ export const DayC = ({
 }: {
   dayName: string;
   digit: number;
-  updateAppState: (tasks: { date: string, name: string }[]) => void;
+  updateAppState: (tasks: { date: string; name: string }[]) => void;
 }) => {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
-  const [expandedTask, setExpandedTask] = useState<{ date: string; name: string } | null>(null);
+  const [expandedTask, setExpandedTask] = useState<{
+    date: string;
+    name: string;
+  } | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [closingHourModal, setClosingHourModal] = useState(false);
@@ -24,7 +27,7 @@ export const DayC = ({
   useEffect(() => {
     // Initialize selectedDate when component mounts
     const weekDays = state.weekInfo;
-    const dayDate = weekDays.find(d => d.digit === digit)?.date;
+    const dayDate = weekDays.find((d) => d.digit === digit)?.date;
     if (dayDate) {
       setSelectedDate(dayDate);
     }
@@ -77,7 +80,9 @@ export const DayC = ({
 
     // Find and remove the task from the list - match by exact date and name
     const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
-      return !(task.date === expandedTask.date && task.name === expandedTask.name);
+      return !(
+        task.date === expandedTask.date && task.name === expandedTask.name
+      );
     });
 
     state.actionsDataOnCurrentWeek = updatedTasks;
@@ -89,7 +94,7 @@ export const DayC = ({
   const openCreateModal = () => {
     // Find the date for this day
     const weekDays = state.weekInfo;
-    const dayDate = weekDays.find(d => d.digit === digit)?.date;
+    const dayDate = weekDays.find((d) => d.digit === digit)?.date;
     setSelectedDate(dayDate || null);
     setTaskDescription("");
     setShowCreateModal(true);
@@ -112,24 +117,18 @@ export const DayC = ({
 
     // Get timezone offset
     const tzOffset = newDate.getTimezoneOffset();
-    const tzString = `${String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, '0')}:${String(Math.abs(tzOffset) % 60).padStart(2, '0')}`;
-    const sign = tzOffset <= 0 ? '+' : '-';
+    const tzString = `${String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, "0")}:${String(Math.abs(tzOffset) % 60).padStart(2, "0")}`;
+    const sign = tzOffset <= 0 ? "+" : "-";
 
     // Create ISO string with timezone info
     const year = newDate.getFullYear();
-    const month = String(newDate.getMonth() + 1).padStart(2, '0');
-    const day = String(newDate.getDate()).padStart(2, '0');
-    const h = String(newDate.getHours()).padStart(2, '0');
-    const m = String(newDate.getMinutes()).padStart(2, '0');
-    const s = String(newDate.getSeconds()).padStart(2, '0');
+    const month = String(newDate.getMonth() + 1).padStart(2, "0");
+    const day = String(newDate.getDate()).padStart(2, "0");
+    const h = String(newDate.getHours()).padStart(2, "0");
+    const m = String(newDate.getMinutes()).padStart(2, "0");
+    const s = String(newDate.getSeconds()).padStart(2, "0");
 
     const dateWithTz = `${year}-${month}-${day}T${h}:${m}:${s}${sign}${tzString}`;
-
-    console.log('Creating task:');
-    console.log('Device timezone offset (minutes):', tzOffset);
-    console.log('Local time:', newDate.toLocaleString());
-    console.log('Date with timezone:', dateWithTz);
-    console.log('Hour from modal:', selectedHour);
 
     const newTask = {
       date: dateWithTz,
@@ -173,24 +172,37 @@ export const DayC = ({
     "23",
   ];
 
+  // Check if this is today's date
+  const today = new Date();
+  const isToday =
+    selectedDate &&
+    selectedDate.getDate() === today.getDate() &&
+    selectedDate.getMonth() === today.getMonth() &&
+    selectedDate.getFullYear() === today.getFullYear();
+  let dayNameclassName = "dayName";
+
+  if (isToday) {
+    dayNameclassName += " today-name ";
+  }
+
   let digitDiv = (
-    <div key={"dayName" + dayName + digit} className="dayName">
+    <div key={"dayName" + dayName + digit} className={dayNameclassName}>
       {digit || 333}
     </div>
   );
   let dayNameDiv = (
-    <div key={"dayName" + dayName} className="dayName">
+    <div key={"dayName" + dayName} className={dayNameclassName}>
       {dayName}
     </div>
   );
   let hoursDivs = [digitDiv, dayNameDiv];
-  for (let i = hours.length - 1; i >= 0; --i) {
 
+  for (let i = hours.length - 1; i >= 0; --i) {
     const h = hours[i];
 
     const hourActions = state.actionsDataOnCurrentWeek.filter((a) => {
       try {
-        console.log('Filtering task:', a);
+        console.log("Filtering task:", a);
         // Parse hour directly from ISO string (before timezone info)
         const timePart = a.date.split("T")[1];
         const actionHour = timePart?.split(":")[0];
@@ -201,18 +213,33 @@ export const DayC = ({
 
         // Create a date object for comparison
         const actionDate = new Date(year, month - 1, day);
-        const currentDayDate = new Date(selectedDate?.getFullYear() || 0, selectedDate?.getMonth() || 0, digit);
+        const currentDayDate = new Date(
+          selectedDate?.getFullYear() || 0,
+          selectedDate?.getMonth() || 0,
+          digit,
+        );
 
-        console.log('Task hour:', actionHour, 'Current hour:', h, 'Task date:', actionDate, 'Current date:', currentDayDate);
+        console.log(
+          "Task hour:",
+          actionHour,
+          "Current hour:",
+          h,
+          "Task date:",
+          actionDate,
+          "Current date:",
+          currentDayDate,
+        );
 
-        return actionDate.getTime() === currentDayDate.getTime() && actionHour === h;
+        return (
+          actionDate.getTime() === currentDayDate.getTime() && actionHour === h
+        );
       } catch (e) {
-        console.error('Filter error:', e);
+        console.error("Filter error:", e);
         return false;
       }
     });
 
-    let className = 'hour';
+    let className = "hour";
     // if (hourActions.length) {
     //   className += ' busy'
     // };
@@ -225,12 +252,14 @@ export const DayC = ({
         key={"hour" + h}
         className={className}
         onClick={() => setSelectedHour(h)}
-        style={{ cursor: hourActions.length > 0 ? 'pointer' : 'default' }}
+        style={{ cursor: hourActions.length > 0 ? "pointer" : "default" }}
       >
         {displayDots.map((_, idx) => (
           <div key={idx} className="busyHour"></div>
         ))}
-        {remainingCount > 0 && <span className="busyHourMore">+{remainingCount}</span>}
+        {remainingCount > 0 && (
+          <span className="busyHourMore">+{remainingCount}</span>
+        )}
         {h}
       </div>
     );
@@ -250,9 +279,16 @@ export const DayC = ({
 
           // Create a date object for comparison
           const actionDate = new Date(year, month - 1, day);
-          const currentDayDate = new Date(selectedDate?.getFullYear() || 0, selectedDate?.getMonth() || 0, digit);
+          const currentDayDate = new Date(
+            selectedDate?.getFullYear() || 0,
+            selectedDate?.getMonth() || 0,
+            digit,
+          );
 
-          return actionDate.getTime() === currentDayDate.getTime() && actionHour === selectedHour;
+          return (
+            actionDate.getTime() === currentDayDate.getTime() &&
+            actionHour === selectedHour
+          );
         } catch {
           return false;
         }
@@ -264,14 +300,19 @@ export const DayC = ({
       {hoursDivs}
       {selectedHour && (
         <div
-          className={`modal-overlay ${closingHourModal ? 'closing' : ''}`}
+          className={`modal-overlay ${closingHourModal ? "closing" : ""}`}
           onClick={closeHourModal}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <div className={`modal-content ${closingHourModal ? 'slide-up' : ''}`} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={`modal-content ${closingHourModal ? "slide-up" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h3>{digit} {dayName} - {selectedHour}:00</h3>
+              <h3>
+                {digit} {dayName} - {selectedHour}:00
+              </h3>
               <div className="modal-header-buttons">
                 <button
                   className="add-task-btn-header"
@@ -280,10 +321,7 @@ export const DayC = ({
                 >
                   +
                 </button>
-                <button
-                  className="modal-close"
-                  onClick={closeHourModal}
-                >
+                <button className="modal-close" onClick={closeHourModal}>
                   ✕
                 </button>
               </div>
@@ -306,7 +344,10 @@ export const DayC = ({
                           <button
                             className="expand-btn"
                             onClick={() =>
-                              setExpandedTask({ date: action.date, name: action.name })
+                              setExpandedTask({
+                                date: action.date,
+                                name: action.name,
+                              })
                             }
                             title="Посмотреть полное описание"
                           >
@@ -325,14 +366,19 @@ export const DayC = ({
       )}
       {expandedTask && (
         <div
-          className={`modal-overlay ${closingDetailModal ? 'closing' : ''}`}
+          className={`modal-overlay ${closingDetailModal ? "closing" : ""}`}
           onClick={closeDetailModal}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <div className={`modal-content modal-details ${closingDetailModal ? 'slide-right' : ''}`} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={`modal-content modal-details ${closingDetailModal ? "slide-right" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h3>{expandedTask.date.split("T")[1].substring(0, 5)} - Описание</h3>
+              <h3>
+                {expandedTask.date.split("T")[1].substring(0, 5)} - Описание
+              </h3>
               <div className="modal-header-buttons">
                 <button
                   className="delete-task-btn"
@@ -341,10 +387,7 @@ export const DayC = ({
                 >
                   🗑️
                 </button>
-                <button
-                  className="modal-close"
-                  onClick={closeDetailModal}
-                >
+                <button className="modal-close" onClick={closeDetailModal}>
                   ✕
                 </button>
               </div>
@@ -357,18 +400,18 @@ export const DayC = ({
       )}
       {showCreateModal && (
         <div
-          className={`modal-overlay ${closingCreateModal ? 'closing' : ''}`}
+          className={`modal-overlay ${closingCreateModal ? "closing" : ""}`}
           onClick={closeCreateModal}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <div className={`modal-content modal-create ${closingCreateModal ? 'slide-up' : ''}`} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={`modal-content modal-create ${closingCreateModal ? "slide-up" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
               <h3>Новое задание</h3>
-              <button
-                className="modal-close"
-                onClick={closeCreateModal}
-              >
+              <button className="modal-close" onClick={closeCreateModal}>
                 ✕
               </button>
             </div>
