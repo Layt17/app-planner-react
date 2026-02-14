@@ -22,6 +22,7 @@ export const DayC = ({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [closingCreateModal, setClosingCreateModal] = useState(false);
   const [taskDescription, setTaskDescription] = useState("");
+  const [taskMinutes, setTaskMinutes] = useState("00");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -97,6 +98,7 @@ export const DayC = ({
     const dayDate = weekDays.find((d) => d.digit === digit)?.date;
     setSelectedDate(dayDate || null);
     setTaskDescription("");
+    setTaskMinutes("00");
     setShowCreateModal(true);
   };
 
@@ -113,7 +115,8 @@ export const DayC = ({
 
     const newDate = new Date(selectedDate);
     const hour = parseInt(selectedHour);
-    newDate.setHours(hour, 0, 0, 0);
+    const minutes = parseInt(taskMinutes);
+    newDate.setHours(hour, minutes, 0, 0);
 
     // Get timezone offset
     const tzOffset = newDate.getTimezoneOffset();
@@ -144,6 +147,7 @@ export const DayC = ({
     closeCreateModal();
     // Reset form
     setTaskDescription("");
+    setTaskMinutes("00");
   };
   const hours = [
     "00",
@@ -416,6 +420,26 @@ export const DayC = ({
               </button>
             </div>
             <div className="modal-body">
+              <div className="form-group">
+                <label>Час: {selectedHour}</label>
+              </div>
+              <div className="form-group">
+                <label>Минуты</label>
+                <select
+                  value={taskMinutes}
+                  onChange={(e) => setTaskMinutes(e.target.value.padStart(2, "0"))}
+                  className="task-input"
+                >
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const minutes = i * 5;
+                    return (
+                      <option key={i} value={String(minutes).padStart(2, "0")}>
+                        {String(minutes).padStart(2, "0")}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
               <div className="form-group">
                 <label>Описание задания</label>
                 <textarea
