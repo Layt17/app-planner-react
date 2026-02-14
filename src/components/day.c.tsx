@@ -4,9 +4,11 @@ import { state } from "../App";
 export const DayC = ({
   dayName,
   digit,
+  updateAppState,
 }: {
   dayName: string;
   digit: number;
+  updateAppState: (tasks: { date: string, name: string }[]) => void;
 }) => {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
   const [expandedTask, setExpandedTask] = useState<{ name: string; time: string } | null>(null);
@@ -14,6 +16,10 @@ export const DayC = ({
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [closingHourModal, setClosingHourModal] = useState(false);
   const [closingDetailModal, setClosingDetailModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [closingCreateModal, setClosingCreateModal] = useState(false);
+  const [taskDescription, setTaskDescription] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -55,6 +61,44 @@ export const DayC = ({
       setExpandedTask(null);
       setClosingDetailModal(false);
     }, 300);
+  };
+
+  const openCreateModal = () => {
+    // Find the date for this day
+    const weekDays = state.weekInfo;
+    const dayDate = weekDays.find(d => d.digit === digit)?.date;
+    setSelectedDate(dayDate || null);
+    setTaskDescription("");
+    setShowCreateModal(true);
+  };
+
+  const closeCreateModal = () => {
+    setClosingCreateModal(true);
+    setTimeout(() => {
+      setShowCreateModal(false);
+      setClosingCreateModal(false);
+    }, 300);
+  };
+
+  const handleSaveTask = () => {
+    if (!taskDescription.trim() || !selectedDate || !selectedHour) return;
+
+    const newDate = new Date(selectedDate);
+    newDate.setHours(parseInt(selectedHour), 0, 0, 0);
+
+    const newTask = {
+      date: newDate.toISOString(),
+      name: taskDescription,
+    };
+
+    // Add to local state and trigger re-render
+    const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
+    state.actionsDataOnCurrentWeek = updatedTasks;
+    updateAppState(updatedTasks);
+
+    closeCreateModal();
+    // Close the hour modal after saving
+    closeHourModal();
   };
   const hours = [
     "00",
@@ -158,12 +202,21 @@ export const DayC = ({
           <div className={`modal-content ${closingHourModal ? 'slide-up' : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{digit} {dayName} - {selectedHour}:00</h3>
-              <button
-                className="modal-close"
-                onClick={closeHourModal}
-              >
-                ✕
-              </button>
+              <div className="modal-header-buttons">
+                <button
+                  className="add-task-btn-header"
+                  onClick={openCreateModal}
+                  title="Добавить задание"
+                >
+                  +
+                </button>
+                <button
+                  className="modal-close"
+                  onClick={closeHourModal}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="modal-body">
               {selectedHourActions.length > 0 ? (
@@ -219,6 +272,45 @@ export const DayC = ({
             </div>
             <div className="modal-body details-body">
               <p>{expandedTask.name}</p>
+            </div>
+          </div>
+        </div>
+      )}
+      {showCreateModal && (
+        <div
+          className={`modal-overlay ${closingCreateModal ? 'closing' : ''}`}
+          onClick={closeCreateModal}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className={`modal-content modal-create ${closingCreateModal ? 'slide-up' : ''}`} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Новое задание</h3>
+              <button
+                className="modal-close"
+                onClick={closeCreateModal}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Описание задания</label>
+                <textarea
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  placeholder="Введите описание задания..."
+                  className="task-input"
+                  rows={4}
+                />
+              </div>
+              <button
+                className="save-task-btn"
+                onClick={handleSaveTask}
+                disabled={!taskDescription.trim()}
+              >
+                Сохранить
+              </button>
             </div>
           </div>
         </div>

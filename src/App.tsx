@@ -116,11 +116,16 @@ function App() {
 
   if (loading) return <div>Loading...</div>;
 
+  const updateAppState = (newTasks: { date: string, name: string }[]) => {
+    state.actionsDataOnCurrentWeek = newTasks;
+    setAppState(prev => ({ ...prev, actionsDataOnCurrentWeek: newTasks }));
+  };
+
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
       <HeaderC userInfo={userInfo!} />
-      <MainC />
+      <MainC updateAppState={updateAppState} />
       <FooterC updateStateApp={setAppState} />
     </div>
   );
