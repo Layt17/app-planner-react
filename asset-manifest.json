@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/app-planner-react/static/css/main.32860f33.css",
+    "main.css": "/app-planner-react/static/css/main.05421979.css",
     "main.js": "/app-planner-react/static/js/main.55ca8098.js",
     "static/js/453.691631cb.chunk.js": "/app-planner-react/static/js/453.691631cb.chunk.js",
     "index.html": "/app-planner-react/index.html",
-    "main.32860f33.css.map": "/app-planner-react/static/css/main.32860f33.css.map",
+    "main.05421979.css.map": "/app-planner-react/static/css/main.05421979.css.map",
     "main.55ca8098.js.map": "/app-planner-react/static/js/main.55ca8098.js.map",
     "453.691631cb.chunk.js.map": "/app-planner-react/static/js/453.691631cb.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.32860f33.css",
+    "static/css/main.05421979.css",
     "static/js/main.55ca8098.js"
   ]
 }
