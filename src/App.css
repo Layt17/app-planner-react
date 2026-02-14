@@ -500,6 +500,20 @@
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
 }
 
+.task-input[type="number"],
+.task-input[type="text"],
+.task-input select {
+  max-height: 40px;
+  font-size: 14px;
+}
+
+select.task-input {
+  padding: 8px;
+  height: auto;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 textarea.task-input {
   resize: vertical;
 }

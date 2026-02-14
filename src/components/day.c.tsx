@@ -429,6 +429,7 @@ export const DayC = ({
                   value={taskMinutes}
                   onChange={(e) => setTaskMinutes(e.target.value.padStart(2, "0"))}
                   className="task-input"
+                  style={{ height: "40px", fontSize: "14px" }}
                 >
                   {Array.from({ length: 12 }, (_, i) => {
                     const minutes = i * 5;
