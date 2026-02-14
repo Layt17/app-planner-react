@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { state } from "../App";
 
 export const DayC = ({
@@ -11,7 +11,7 @@ export const DayC = ({
   updateAppState: (tasks: { date: string, name: string }[]) => void;
 }) => {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
-  const [expandedTask, setExpandedTask] = useState<{ name: string; time: string } | null>(null);
+  const [expandedTask, setExpandedTask] = useState<{ date: string; name: string } | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [closingHourModal, setClosingHourModal] = useState(false);
@@ -20,6 +20,15 @@ export const DayC = ({
   const [closingCreateModal, setClosingCreateModal] = useState(false);
   const [taskDescription, setTaskDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    // Initialize selectedDate when component mounts
+    const weekDays = state.weekInfo;
+    const dayDate = weekDays.find(d => d.digit === digit)?.date;
+    if (dayDate) {
+      setSelectedDate(dayDate);
+    }
+  }, [digit]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -63,6 +72,20 @@ export const DayC = ({
     }, 300);
   };
 
+  const handleDeleteTask = () => {
+    if (!expandedTask) return;
+
+    // Find and remove the task from the list - match by exact date and name
+    const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
+      return !(task.date === expandedTask.date && task.name === expandedTask.name);
+    });
+
+    state.actionsDataOnCurrentWeek = updatedTasks;
+    updateAppState(updatedTasks);
+
+    closeDetailModal();
+  };
+
   const openCreateModal = () => {
     // Find the date for this day
     const weekDays = state.weekInfo;
@@ -84,10 +107,32 @@ export const DayC = ({
     if (!taskDescription.trim() || !selectedDate || !selectedHour) return;
 
     const newDate = new Date(selectedDate);
-    newDate.setHours(parseInt(selectedHour), 0, 0, 0);
+    const hour = parseInt(selectedHour);
+    newDate.setHours(hour, 0, 0, 0);
+
+    // Get timezone offset
+    const tzOffset = newDate.getTimezoneOffset();
+    const tzString = `${String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, '0')}:${String(Math.abs(tzOffset) % 60).padStart(2, '0')}`;
+    const sign = tzOffset <= 0 ? '+' : '-';
+
+    // Create ISO string with timezone info
+    const year = newDate.getFullYear();
+    const month = String(newDate.getMonth() + 1).padStart(2, '0');
+    const day = String(newDate.getDate()).padStart(2, '0');
+    const h = String(newDate.getHours()).padStart(2, '0');
+    const m = String(newDate.getMinutes()).padStart(2, '0');
+    const s = String(newDate.getSeconds()).padStart(2, '0');
+
+    const dateWithTz = `${year}-${month}-${day}T${h}:${m}:${s}${sign}${tzString}`;
+
+    console.log('Creating task:');
+    console.log('Device timezone offset (minutes):', tzOffset);
+    console.log('Local time:', newDate.toLocaleString());
+    console.log('Date with timezone:', dateWithTz);
+    console.log('Hour from modal:', selectedHour);
 
     const newTask = {
-      date: newDate.toISOString(),
+      date: dateWithTz,
       name: taskDescription,
     };
 
@@ -96,9 +141,10 @@ export const DayC = ({
     state.actionsDataOnCurrentWeek = updatedTasks;
     updateAppState(updatedTasks);
 
+    // Close create modal but keep hour modal open
     closeCreateModal();
-    // Close the hour modal after saving
-    closeHourModal();
+    // Reset form
+    setTaskDescription("");
   };
   const hours = [
     "00",
@@ -144,10 +190,24 @@ export const DayC = ({
 
     const hourActions = state.actionsDataOnCurrentWeek.filter((a) => {
       try {
-        const actionDate = new Date(a.date);
-        const actionHour = String(a.date).split("T")[1]?.split(":")[0];
-        return actionDate.getDate() === digit && actionHour === h;
-      } catch {
+        console.log('Filtering task:', a);
+        // Parse hour directly from ISO string (before timezone info)
+        const timePart = a.date.split("T")[1];
+        const actionHour = timePart?.split(":")[0];
+
+        // Parse date part
+        const datePart = a.date.split("T")[0];
+        const [year, month, day] = datePart.split("-").map(Number);
+
+        // Create a date object for comparison
+        const actionDate = new Date(year, month - 1, day);
+        const currentDayDate = new Date(selectedDate?.getFullYear() || 0, selectedDate?.getMonth() || 0, digit);
+
+        console.log('Task hour:', actionHour, 'Current hour:', h, 'Task date:', actionDate, 'Current date:', currentDayDate);
+
+        return actionDate.getTime() === currentDayDate.getTime() && actionHour === h;
+      } catch (e) {
+        console.error('Filter error:', e);
         return false;
       }
     });
@@ -180,9 +240,19 @@ export const DayC = ({
   const selectedHourActions = selectedHour
     ? state.actionsDataOnCurrentWeek.filter((a) => {
         try {
-          const actionDate = new Date(a.date);
-          const actionHour = String(a.date).split("T")[1]?.split(":")[0];
-          return actionDate.getDate() === digit && actionHour === selectedHour;
+          // Parse hour directly from ISO string
+          const timePart = a.date.split("T")[1];
+          const actionHour = timePart?.split(":")[0];
+
+          // Parse date part
+          const datePart = a.date.split("T")[0];
+          const [year, month, day] = datePart.split("-").map(Number);
+
+          // Create a date object for comparison
+          const actionDate = new Date(year, month - 1, day);
+          const currentDayDate = new Date(selectedDate?.getFullYear() || 0, selectedDate?.getMonth() || 0, digit);
+
+          return actionDate.getTime() === currentDayDate.getTime() && actionHour === selectedHour;
         } catch {
           return false;
         }
@@ -236,7 +306,7 @@ export const DayC = ({
                           <button
                             className="expand-btn"
                             onClick={() =>
-                              setExpandedTask({ name: action.name, time })
+                              setExpandedTask({ date: action.date, name: action.name })
                             }
                             title="Посмотреть полное описание"
                           >
@@ -262,13 +332,22 @@ export const DayC = ({
         >
           <div className={`modal-content modal-details ${closingDetailModal ? 'slide-right' : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{expandedTask.time} - Описание</h3>
-              <button
-                className="modal-close"
-                onClick={closeDetailModal}
-              >
-                ✕
-              </button>
+              <h3>{expandedTask.date.split("T")[1].substring(0, 5)} - Описание</h3>
+              <div className="modal-header-buttons">
+                <button
+                  className="delete-task-btn"
+                  onClick={handleDeleteTask}
+                  title="Удалить задание"
+                >
+                  🗑️
+                </button>
+                <button
+                  className="modal-close"
+                  onClick={closeDetailModal}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="modal-body details-body">
               <p>{expandedTask.name}</p>

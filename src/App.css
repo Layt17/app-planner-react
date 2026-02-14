@@ -181,23 +181,23 @@
 
 .busyHour:nth-child(1) {
   top: 2px;
-  right: 2px;
+  left: 2px;
 }
 
 .busyHour:nth-child(2) {
   top: 2px;
-  right: 10px;
+  left: 10px;
 }
 
 .busyHour:nth-child(3) {
   top: 2px;
-  right: 18px;
+  left: 18px;
 }
 
 .busyHourMore {
   position: absolute;
   top: 1px;
-  right: 24px;
+  left: 24px;
   font-size: 8px;
   font-weight: bold;
   color: #33cc33;
@@ -483,4 +483,24 @@ textarea.task-input {
   background-color: #cccccc;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.delete-task-btn {
+  background-color: #dcdcdc;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.delete-task-btn:hover {
+  background-color: #ba3f3f;
+  transform: scale(1.1);
+}
+
+.delete-task-btn:active {
+  background-color: #b71c1c;
+  transform: scale(0.95);
 }
