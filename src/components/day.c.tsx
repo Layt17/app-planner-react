@@ -36,6 +36,21 @@ export const DayC = ({
     }
   }, [digit]);
 
+  const SWIPE_THRESHOLD = 50;
+  const ANIMATION_DURATION = 300;
+
+  const closeModal = (
+    setClosing: (val: boolean) => void,
+    setState: (val: any) => void,
+    newValue: any
+  ) => {
+    setClosing(true);
+    setTimeout(() => {
+      setState(newValue);
+      setClosing(false);
+    }, ANIMATION_DURATION);
+  };
+
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -44,38 +59,22 @@ export const DayC = ({
     setTouchEnd(e.changedTouches[0].clientX);
     if (touchStart && e.changedTouches[0].clientX) {
       const distance = touchStart - e.changedTouches[0].clientX;
-      if (Math.abs(distance) > 50) {
+      if (Math.abs(distance) > SWIPE_THRESHOLD) {
         if (distance > 0 && expandedTask) {
-          setClosingDetailModal(true);
-          setTimeout(() => {
-            setExpandedTask(null);
-            setClosingDetailModal(false);
-          }, 300);
+          closeDetailModal();
         } else if (distance < 0 && selectedHour) {
-          setClosingHourModal(true);
-          setTimeout(() => {
-            setSelectedHour(null);
-            setClosingHourModal(false);
-          }, 300);
+          closeHourModal();
         }
       }
     }
   };
 
   const closeHourModal = () => {
-    setClosingHourModal(true);
-    setTimeout(() => {
-      setSelectedHour(null);
-      setClosingHourModal(false);
-    }, 300);
+    closeModal(setClosingHourModal, setSelectedHour, null);
   };
 
   const closeDetailModal = () => {
-    setClosingDetailModal(true);
-    setTimeout(() => {
-      setExpandedTask(null);
-      setClosingDetailModal(false);
-    }, 300);
+    closeModal(setClosingDetailModal, setExpandedTask, null);
   };
 
   const handleDeleteTask = () => {
@@ -92,81 +91,74 @@ export const DayC = ({
     closeDetailModal();
   };
 
+  const getDayDate = () => {
+    return state.weekInfo.find((d) => d.digit === digit)?.date || null;
+  };
+
+  const formatDateWithTz = (date: Date) => {
+    const tzOffset = date.getTimezoneOffset();
+    const tzString = `${String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, "0")}:${String(Math.abs(tzOffset) % 60).padStart(2, "0")}`;
+    const sign = tzOffset <= 0 ? "+" : "-";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const h = String(date.getHours()).padStart(2, "0");
+    const m = String(date.getMinutes()).padStart(2, "0");
+    const s = String(date.getSeconds()).padStart(2, "0");
+
+    return {
+      dateWithTz: `${year}-${month}-${day}T${h}:${m}:${s}${sign}${tzString}`,
+      time: `${h}:${m}`,
+      date: `${day}-${month}-${year}`,
+    };
+  };
+
   const openCreateModal = () => {
-    // Find the date for this day
-    const weekDays = state.weekInfo;
-    const dayDate = weekDays.find((d) => d.digit === digit)?.date;
-    setSelectedDate(dayDate || null);
+    setSelectedDate(getDayDate());
     setTaskDescription("");
     setTaskMinutes("00");
     setShowCreateModal(true);
   };
 
   const closeCreateModal = () => {
-    setClosingCreateModal(true);
-    setTimeout(() => {
-      setShowCreateModal(false);
-      setClosingCreateModal(false);
-    }, 300);
+    closeModal(setClosingCreateModal, setShowCreateModal, false);
+  };
+
+  const addTaskToState = (newTask: any) => {
+    const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
+    state.actionsDataOnCurrentWeek = updatedTasks;
+    updateAppState(updatedTasks);
   };
 
   const handleSaveTask = async () => {
     if (!taskDescription.trim() || !selectedDate || !selectedHour) return;
 
     const newDate = new Date(selectedDate);
-    const hour = parseInt(selectedHour);
-    const minutes = parseInt(taskMinutes);
-    newDate.setHours(hour, minutes, 0, 0);
+    newDate.setHours(parseInt(selectedHour), parseInt(taskMinutes), 0, 0);
 
-    // Get timezone offset
-    const tzOffset = newDate.getTimezoneOffset();
-    const tzString = `${String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, "0")}:${String(Math.abs(tzOffset) % 60).padStart(2, "0")}`;
-    const sign = tzOffset <= 0 ? "+" : "-";
-
-    // Create ISO string with timezone info
-    const year = newDate.getFullYear();
-    const month = String(newDate.getMonth() + 1).padStart(2, "0");
-    const day = String(newDate.getDate()).padStart(2, "0");
-    const h = String(newDate.getHours()).padStart(2, "0");
-    const m = String(newDate.getMinutes()).padStart(2, "0");
-    const s = String(newDate.getSeconds()).padStart(2, "0");
-
-    const dateWithTz = `${year}-${month}-${day}T${h}:${m}:${s}${sign}${tzString}`;
+    const { time, date } = formatDateWithTz(newDate);
 
     try {
       const response = await axios.post("http://localhost:8000/notifications", {
         chatId: "927408284",
         text: taskDescription,
-        time: `${h}:${m}`,
-        date: `${day}-${month}-${year}`
+        time,
+        date,
       });
 
-      // Использовать объект из ответа или создать новый с локальными данными
       const newTask = {
         date: response.data.time,
         name: response.data.text,
         id: response.data.id,
       };
 
-      // Add to local state and trigger re-render
-      const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
-      state.actionsDataOnCurrentWeek = updatedTasks;
-      updateAppState(updatedTasks);
+      addTaskToState(newTask);
     } catch (error) {
       console.error("Error saving task:", error);
-      // Если ошибка, все равно добавляем задачу локально
-      // const newTask = {
-      //   date: dateWithTz,
-      //   name: taskDescription,
-      // };
-      // const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
-      // state.actionsDataOnCurrentWeek = updatedTasks;
-      // updateAppState(updatedTasks);
     }
 
-    // Close create modal but keep hour modal open
     closeCreateModal();
-    // Reset form
     setTaskDescription("");
     setTaskMinutes("00");
   };
