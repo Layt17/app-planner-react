@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { state } from "../App";
+import axios from "axios";
 
 export const DayC = ({
   dayName,
@@ -8,12 +9,13 @@ export const DayC = ({
 }: {
   dayName: string;
   digit: number;
-  updateAppState: (tasks: { date: string; name: string }[]) => void;
+  updateAppState: (tasks: { date: string; name: string; id?: string }[]) => void;
 }) => {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
   const [expandedTask, setExpandedTask] = useState<{
     date: string;
     name: string;
+    id?: string;
   } | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -81,9 +83,7 @@ export const DayC = ({
 
     // Find and remove the task from the list - match by exact date and name
     const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
-      return !(
-        task.date === expandedTask.date && task.name === expandedTask.name
-      );
+      return !(task.id === expandedTask.id);
     });
 
     state.actionsDataOnCurrentWeek = updatedTasks;
@@ -110,7 +110,7 @@ export const DayC = ({
     }, 300);
   };
 
-  const handleSaveTask = () => {
+  const handleSaveTask = async () => {
     if (!taskDescription.trim() || !selectedDate || !selectedHour) return;
 
     const newDate = new Date(selectedDate);
@@ -133,15 +133,36 @@ export const DayC = ({
 
     const dateWithTz = `${year}-${month}-${day}T${h}:${m}:${s}${sign}${tzString}`;
 
-    const newTask = {
-      date: dateWithTz,
-      name: taskDescription,
-    };
+    try {
+      const response = await axios.post("http://localhost:8000/notifications", {
+        chatId: "927408284",
+        text: taskDescription,
+        time: `${h}:${m}`,
+        date: `${day}-${month}-${year}`
+      });
 
-    // Add to local state and trigger re-render
-    const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
-    state.actionsDataOnCurrentWeek = updatedTasks;
-    updateAppState(updatedTasks);
+      // Использовать объект из ответа или создать новый с локальными данными
+      const newTask = {
+        date: response.data.time,
+        name: response.data.text,
+        id: response.data.id,
+      };
+
+      // Add to local state and trigger re-render
+      const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
+      state.actionsDataOnCurrentWeek = updatedTasks;
+      updateAppState(updatedTasks);
+    } catch (error) {
+      console.error("Error saving task:", error);
+      // Если ошибка, все равно добавляем задачу локально
+      // const newTask = {
+      //   date: dateWithTz,
+      //   name: taskDescription,
+      // };
+      // const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
+      // state.actionsDataOnCurrentWeek = updatedTasks;
+      // updateAppState(updatedTasks);
+    }
 
     // Close create modal but keep hour modal open
     closeCreateModal();
@@ -351,6 +372,7 @@ export const DayC = ({
                               setExpandedTask({
                                 date: action.date,
                                 name: action.name,
+                                id: "new",
                               })
                             }
                             title="Посмотреть полное описание"
@@ -427,7 +449,9 @@ export const DayC = ({
                 <label>Минуты</label>
                 <select
                   value={taskMinutes}
-                  onChange={(e) => setTaskMinutes(e.target.value.padStart(2, "0"))}
+                  onChange={(e) =>
+                    setTaskMinutes(e.target.value.padStart(2, "0"))
+                  }
                   className="task-input"
                   style={{ height: "40px", fontSize: "14px" }}
                 >
