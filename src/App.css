@@ -556,6 +556,26 @@ textarea.task-input {
   opacity: 0.6;
 }
 
+.complete-task-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.complete-task-btn:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.complete-task-btn:active:not(:disabled) {
+  background-color: #3d8b40;
+}
+
 .delete-task-btn {
   background-color: #dcdcdc;
   border: none;

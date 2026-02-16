@@ -13,11 +13,7 @@ export const DayC = ({
   updateAppState: (tasks: TaskI[]) => void;
 }) => {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
-  const [expandedTask, setExpandedTask] = useState<{
-    date: string;
-    name: string;
-    id?: string;
-  } | null>(null);
+  const [expandedTask, setExpandedTask] = useState<TaskI | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [closingHourModal, setClosingHourModal] = useState(false);
@@ -79,7 +75,6 @@ export const DayC = ({
   };
 
   const handleDeleteTask = async () => {
-    console.log(expandedTask);
     if (!expandedTask) return;
 
     await axios.delete(
@@ -92,6 +87,25 @@ export const DayC = ({
 
     state.actionsDataOnCurrentWeek = updatedTasks;
     updateAppState(updatedTasks);
+
+    closeDetailModal();
+  };
+
+  const handleCompleteTask = async () => {
+    if (!expandedTask) return;
+    await axios.patch(
+      `http://localhost:8000/notifications/${expandedTask.id}`,
+      { status: "completed" },
+    );
+
+    // todo - надо сделать чтобы таски хранились key-value и доставать их по ключу
+    state.actionsDataOnCurrentWeek.forEach((t) => {
+      if (t.id === expandedTask.id) {
+        t.status = "completed";
+      }
+    });
+
+    updateAppState(state.actionsDataOnCurrentWeek);
 
     closeDetailModal();
   };
@@ -375,7 +389,8 @@ export const DayC = ({
                               setExpandedTask({
                                 date: action.date,
                                 name: action.name,
-                                id: action.id
+                                id: action.id,
+                                status: action.status,
                               })
                             }
                             title="Посмотреть полное описание"
@@ -424,6 +439,14 @@ export const DayC = ({
             <div className="modal-body details-body">
               <p>{expandedTask.name}</p>
             </div>
+            {expandedTask.status !== "completed" && (
+              <button
+                className="complete-task-btn"
+                onClick={handleCompleteTask}
+              >
+                Выполнить
+              </button>
+            )}
           </div>
         </div>
       )}
