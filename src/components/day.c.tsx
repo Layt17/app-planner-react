@@ -380,7 +380,14 @@ export const DayC = ({
                     .map((action, idx) => {
                       const time = action.date.split("T")[1].substring(0, 5);
                       return (
-                        <li key={idx}>
+                        <li
+                          key={idx}
+                          className={
+                            action.status === "completed"
+                              ? "completedTaskList"
+                              : "inProcessingTaskList"
+                          }
+                        >
                           <div className="task-time">{time}</div>
                           <div className="task-name">{action.name}</div>
                           <button

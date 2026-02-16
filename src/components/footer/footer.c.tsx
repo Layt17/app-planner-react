@@ -8,11 +8,11 @@ export const FooterC = (props: Props & object) => {
     const prevCursorDay = new Date(state.weekInfo[0].date);
 
     const nextCursorDay = new Date(prevCursorDay).setDate(
-      prevCursorDay.getDate() - 1
+      prevCursorDay.getDate() - 1,
     );
 
     state.weekInfo = getWeekDays(new Date(nextCursorDay));
-    state.mainAnimation = 'leftSlide';
+    state.mainAnimation = "leftSlide";
     props.updateStateApp(state.weekInfo);
   };
 
@@ -20,11 +20,11 @@ export const FooterC = (props: Props & object) => {
     const prevCursorDay = new Date(state.weekInfo[6].date);
 
     const nextCursorDay = new Date(prevCursorDay).setDate(
-      prevCursorDay.getDate() + 1
+      prevCursorDay.getDate() + 1,
     );
 
     state.weekInfo = getWeekDays(new Date(nextCursorDay));
-    state.mainAnimation = 'rightSlide';
+    state.mainAnimation = "rightSlide";
     props.updateStateApp(state.weekInfo);
   };
 
@@ -34,23 +34,23 @@ export const FooterC = (props: Props & object) => {
     const todayFirstDay = getWeekDays(currentDate)[0].date.getTime();
 
     if (todayFirstDay < currentFirstDay) {
-      state.mainAnimation = 'leftSlide';
+      state.mainAnimation = "leftSlide";
     } else if (todayFirstDay > currentFirstDay) {
-      state.mainAnimation = 'rightSlide';
+      state.mainAnimation = "rightSlide";
     } else {
-      state.mainAnimation = '';
+      state.mainAnimation = "";
     }
 
     state.weekInfo = getWeekDays(currentDate);
     props.updateStateApp(state.weekInfo);
   };
 
-  const firstDayStr = `${state.weekInfo[0].date.getMonth() + 1}.${
+  const firstDayStr = `${
     state.weekInfo[0].digit
-  }.${state.weekInfo[0].date.getFullYear()}`;
-  const lastDayStr = `${state.weekInfo[6].date.getMonth() + 1}.${
+  }.${state.weekInfo[0].date.getMonth() + 1}.${state.weekInfo[0].date.getFullYear()}`;
+  const lastDayStr = `${
     state.weekInfo[6].digit
-  }.${state.weekInfo[6].date.getFullYear()}`;
+  }.${state.weekInfo[6].date.getMonth() + 1}.${state.weekInfo[6].date.getFullYear()}`;
 
   return (
     <div id="footer">
@@ -65,7 +65,9 @@ export const FooterC = (props: Props & object) => {
       <button id="leftArrowButton" onClick={handleClickLeft}>
         🔙
       </button>
-      <button id="rightArrowButton" onClick={handleClickRight}>🔜</button>
+      <button id="rightArrowButton" onClick={handleClickRight}>
+        🔜
+      </button>
     </div>
   );
 };
