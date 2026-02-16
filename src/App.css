@@ -175,14 +175,14 @@
 .dayName {
   display: grid;
   place-items: center;
-  background-color: rgb(209 206 209);
+  background-color: #f0f0f0;
 }
 .hour {
   box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.2);
   text-align: center;
   font-size: small;
-  color: #afabab;
-  background-color: #f8f8f8;
+  color: #828282;
+  background-color: rgb(218, 218, 218);
   font-size: 50%;
   display: grid;
   place-items: center; /* Центрирование по обеям */
@@ -198,7 +198,7 @@
 }
 
 .today-hour {
-  box-shadow: -3px 3px 3px rgba(162, 134, 165, 0.2);
+  background-color: #f0f0f0;
 }
 
 .today-name {
@@ -214,12 +214,20 @@
   height: 100%;
   display: flex;
 }
+
+.completedTask {
+  background-color: #33cc33;
+}
+
+.inProcessingTask {
+  background-color: #0080ff;
+}
+
 .busyHour {
   width: 50%;
   position: absolute;
   width: 6px;
   height: 6px;
-  background-color: #33cc33;
   border-radius: 50%;
   pointer-events: none;
 }

@@ -6,6 +6,7 @@ import { FooterC } from "./components/footer/footer.c";
 import { TgAppDataI } from "./interfaces/tg-web-app-data.interface";
 import axios from "axios";
 import { NotificationI } from "./interfaces/notification.interface";
+import { TaskI } from "./interfaces/task.interface";
 
 export const local = "ru-RU";
 export const currentDate = new Date();
@@ -70,7 +71,7 @@ export const state = {
   nextCursorDay: currentDate,
   weekInfo: getWeekDays(),
   mainAnimation: "",
-  actionsDataOnCurrentWeek: [] as { date: string; name: string; id?: string }[],
+  actionsDataOnCurrentWeek: [] as TaskI[],
 };
 
 export const updateState = (date?: Date, nextCursorDay?: Date) => {
@@ -111,10 +112,11 @@ function App() {
     axios
       .get("http://localhost:8000/notifications/my-notifs/927408284")
       .then((response) => {
-        const mappedNotifs = (response.data as NotificationI[]).map((n) => {
+        const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map((n) => {
           return {
             date: new Date(n.time).toISOString(),
             name: n.text,
+            status: n.status,
             id: n.id,
           };
         });
@@ -131,7 +133,9 @@ function App() {
 
   if (loading) return <div>Loading...</div>;
 
-  const updateAppState = (newTasks: { date: string; name: string }[]) => {
+  const updateAppState = (
+    newTasks: TaskI[],
+  ) => {
     state.actionsDataOnCurrentWeek = newTasks;
     setAppState((prev) => ({ ...prev, actionsDataOnCurrentWeek: newTasks }));
   };

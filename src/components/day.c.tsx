@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { state } from "../App";
 import axios from "axios";
+import { TaskI } from "../interfaces/task.interface";
 
 export const DayC = ({
   dayName,
@@ -9,7 +10,7 @@ export const DayC = ({
 }: {
   dayName: string;
   digit: number;
-  updateAppState: (tasks: { date: string; name: string; id?: string }[]) => void;
+  updateAppState: (tasks: TaskI[]) => void;
 }) => {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
   const [expandedTask, setExpandedTask] = useState<{
@@ -42,7 +43,7 @@ export const DayC = ({
   const closeModal = (
     setClosing: (val: boolean) => void,
     setState: (val: any) => void,
-    newValue: any
+    newValue: any,
   ) => {
     setClosing(true);
     setTimeout(() => {
@@ -51,23 +52,23 @@ export const DayC = ({
     }, ANIMATION_DURATION);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
+  // const handleTouchStart = (e: React.TouchEvent) => {
+  //   setTouchStart(e.targetTouches[0].clientX);
+  // };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    setTouchEnd(e.changedTouches[0].clientX);
-    if (touchStart && e.changedTouches[0].clientX) {
-      const distance = touchStart - e.changedTouches[0].clientX;
-      if (Math.abs(distance) > SWIPE_THRESHOLD) {
-        if (distance > 0 && expandedTask) {
-          closeDetailModal();
-        } else if (distance < 0 && selectedHour) {
-          closeHourModal();
-        }
-      }
-    }
-  };
+  // const handleTouchEnd = (e: React.TouchEvent) => {
+  //   setTouchEnd(e.changedTouches[0].clientX);
+  //   if (touchStart && e.changedTouches[0].clientX) {
+  //     const distance = touchStart - e.changedTouches[0].clientX;
+  //     if (Math.abs(distance) > SWIPE_THRESHOLD) {
+  //       if (distance > 0 && expandedTask) {
+  //         closeDetailModal();
+  //       } else if (distance < 0 && selectedHour) {
+  //         closeHourModal();
+  //       }
+  //     }
+  //   }
+  // };
 
   const closeHourModal = () => {
     closeModal(setClosingHourModal, setSelectedHour, null);
@@ -77,9 +78,13 @@ export const DayC = ({
     closeModal(setClosingDetailModal, setExpandedTask, null);
   };
 
-  const handleDeleteTask = () => {
+  const handleDeleteTask = async () => {
+    console.log(expandedTask);
     if (!expandedTask) return;
 
+    await axios.delete(
+      `http://localhost:8000/notifications/${expandedTask.id}`,
+    );
     // Find and remove the task from the list - match by exact date and name
     const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
       return !(task.id === expandedTask.id);
@@ -147,9 +152,10 @@ export const DayC = ({
         date,
       });
 
-      const newTask = {
+      const newTask: TaskI = {
         date: response.data.time,
         name: response.data.text,
+        status: response.data.status,
         id: response.data.id,
       };
 
@@ -263,6 +269,9 @@ export const DayC = ({
 
     const displayDots = hourActions.slice(0, 3);
     const remainingCount = hourActions.length > 3 ? hourActions.length - 3 : 0;
+    if (isToday) {
+      className += " today-hour";
+    }
 
     const divHour = (
       <div
@@ -271,9 +280,11 @@ export const DayC = ({
         onClick={() => setSelectedHour(h)}
         style={{ cursor: hourActions.length > 0 ? "pointer" : "default" }}
       >
-        {displayDots.map((_, idx) => (
-          <div key={idx} className="busyHour"></div>
-        ))}
+        {displayDots.map((v, idx) => {
+          const taskClass =
+            v.status === "completed" ? "completedTask" : "inProcessingTask";
+          return <div key={idx} className={`busyHour ${taskClass}`}></div>;
+        })}
         {remainingCount > 0 && (
           <span className="busyHourMore">+{remainingCount}</span>
         )}
@@ -319,8 +330,8 @@ export const DayC = ({
         <div
           className={`modal-overlay ${closingHourModal ? "closing" : ""}`}
           onClick={closeHourModal}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          // onTouchStart={handleTouchStart}
+          // onTouchEnd={handleTouchEnd}
         >
           <div
             className={`modal-content ${closingHourModal ? "slide-up" : ""}`}
@@ -364,7 +375,7 @@ export const DayC = ({
                               setExpandedTask({
                                 date: action.date,
                                 name: action.name,
-                                id: "new",
+                                id: action.id
                               })
                             }
                             title="Посмотреть полное описание"
@@ -386,8 +397,8 @@ export const DayC = ({
         <div
           className={`modal-overlay ${closingDetailModal ? "closing" : ""}`}
           onClick={closeDetailModal}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          // onTouchStart={handleTouchStart}
+          // onTouchEnd={handleTouchEnd}
         >
           <div
             className={`modal-content modal-details ${closingDetailModal ? "slide-right" : ""}`}
@@ -420,8 +431,8 @@ export const DayC = ({
         <div
           className={`modal-overlay ${closingCreateModal ? "closing" : ""}`}
           onClick={closeCreateModal}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          // onTouchStart={handleTouchStart}
+          // onTouchEnd={handleTouchEnd}
         >
           <div
             className={`modal-content modal-create ${closingCreateModal ? "slide-up" : ""}`}
