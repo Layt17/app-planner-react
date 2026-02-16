@@ -215,6 +215,19 @@
   display: flex;
 }
 
+.completedTaskDetails {
+  background-color: #d6f3d6;
+  border-radius: 5%;
+  width: 20%;
+  text-align: center;
+}
+
+.inProcessingTaskDetails {
+  background-color: #e5f2ff;
+  border-radius: 5%;
+  width: 20%;
+  text-align: center;
+}
 .completedTask {
   background-color: #33cc33;
 }
@@ -362,7 +375,7 @@
   margin: 0;
   font-size: 18px;
   color: #333;
-  flex: 1;
+  /* flex: 1; */
 }
 
 .modal-header-buttons {

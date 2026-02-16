@@ -430,6 +430,17 @@ export const DayC = ({
               <h3>
                 {expandedTask.date.split("T")[1].substring(0, 5)} - Описание
               </h3>
+              <div
+                className={
+                  expandedTask.status === "completed"
+                    ? "completedTaskDetails"
+                    : "inProcessingTaskDetails"
+                }
+              >
+                {expandedTask.status === "completed"
+                  ? "Выполнено"
+                  : "В процессе"}
+              </div>
               <div className="modal-header-buttons">
                 <button
                   className="delete-task-btn"
