@@ -23,6 +23,7 @@ export const DayC = ({
   const [taskDescription, setTaskDescription] = useState("");
   const [taskMinutes, setTaskMinutes] = useState("00");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     // Initialize selectedDate when component mounts
@@ -32,6 +33,15 @@ export const DayC = ({
       setSelectedDate(dayDate);
     }
   }, [digit]);
+
+  useEffect(() => {
+    // Update current time every minute to update the line position
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
 
   const SWIPE_THRESHOLD = 50;
   const ANIMATION_DURATION = 300;
@@ -78,7 +88,7 @@ export const DayC = ({
     if (!expandedTask) return;
 
     await axios.delete(
-      `http://85.239.43.136:8000/notifications/${expandedTask.id}`,
+      `http://localhost:8000/notifications/${expandedTask.id}`,
     );
     // Find and remove the task from the list - match by exact date and name
     const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
@@ -94,7 +104,7 @@ export const DayC = ({
   const handleCompleteTask = async () => {
     if (!expandedTask) return;
     await axios.patch(
-      `http://85.239.43.136:8000/notifications/${expandedTask.id}`,
+      `http://localhost:8000/notifications/${expandedTask.id}`,
       { status: "completed" },
     );
 
@@ -159,7 +169,7 @@ export const DayC = ({
     const { time, date } = formatDateWithTz(newDate);
 
     try {
-      const response = await axios.post("http://85.239.43.136:8000/notifications", {
+      const response = await axios.post("http://localhost:8000/notifications", {
         chatId: state.userInfo?.chatId || "",
         text: taskDescription,
         time,
@@ -216,6 +226,13 @@ export const DayC = ({
     selectedDate.getDate() === today.getDate() &&
     selectedDate.getMonth() === today.getMonth() &&
     selectedDate.getFullYear() === today.getFullYear();
+
+  // Get current hour for highlighting
+  const getCurrentHour = () => {
+    if (!isToday) return null;
+    return String(currentTime.getHours()).padStart(2, "0");
+  };
+
   let dayNameclassName = "dayName";
 
   if (isToday) {
@@ -287,18 +304,60 @@ export const DayC = ({
       className += " today-hour";
     }
 
+    const currentHourStr = getCurrentHour();
+    const isCurrentHour = isToday && currentHourStr === h;
+
+    // Calculate line position based on minutes (0-59 minutes = 100-0%, moving up)
+    const getLineTopPosition = () => {
+      const minutes = currentTime.getMinutes();
+      return 100 - (minutes / 60) * 100;
+    };
+
     const divHour = (
       <div
         key={"hour" + h}
         className={className}
         onClick={() => setSelectedHour(h)}
-        style={{ cursor: hourActions.length > 0 ? "pointer" : "default" }}
+        style={{
+          cursor: hourActions.length > 0 ? "pointer" : "default",
+          position: "relative",
+        }}
       >
         {displayDots.map((v, idx) => {
           const taskClass =
             v.status === "completed" ? "completedTask" : "inProcessingTask";
           return <div key={idx} className={`busyHour ${taskClass}`}></div>;
         })}
+        {isCurrentHour && (
+          <>
+            <div
+              style={{
+                position: "absolute",
+                right: "2px",
+                top: `${getLineTopPosition()}%`,
+                transform: "translateY(-50%)",
+                width: 0,
+                height: 0,
+                borderRight: "6px solid rgb(162, 134, 165)",
+                borderTop: "4px solid transparent",
+                borderBottom: "4px solid transparent",
+                zIndex: 5,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                right: "8px",
+                top: `${getLineTopPosition()}%`,
+                left: 0,
+                height: "1px",
+                backgroundColor: "rgba(162, 134, 165, 0.3)",
+                transform: "translateY(-50%)",
+                zIndex: 4,
+              }}
+            />
+          </>
+        )}
         {remainingCount > 0 && (
           <span className="busyHourMore">+{remainingCount}</span>
         )}
@@ -338,7 +397,7 @@ export const DayC = ({
     : [];
 
   const dayDiv = (
-    <div key={"day" + dayName} className="day">
+    <div key={"day" + dayName} className="day" style={{ position: "relative" }}>
       {hoursDivs}
       {selectedHour && (
         <div

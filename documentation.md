@@ -92,7 +92,7 @@ Three-layer modal system:
 
 ## API Integration
 
-- **Endpoint**: `http://85.239.43.136:8000/api`
+- **Endpoint**: `http://localhost:8000/api`
 - **Method**: GET
 - **Response**: Array of tasks with `date` and `name` fields
 
