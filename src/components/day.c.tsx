@@ -1,60 +1,186 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { state } from "../App";
+import axios from "axios";
+import { TaskI } from "../interfaces/task.interface";
 
 export const DayC = ({
   dayName,
   digit,
+  updateAppState,
 }: {
   dayName: string;
   digit: number;
+  updateAppState: (tasks: TaskI[]) => void;
 }) => {
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
-  const [expandedTask, setExpandedTask] = useState<{ name: string; time: string } | null>(null);
+  const [expandedTask, setExpandedTask] = useState<TaskI | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [closingHourModal, setClosingHourModal] = useState(false);
   const [closingDetailModal, setClosingDetailModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [closingCreateModal, setClosingCreateModal] = useState(false);
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskMinutes, setTaskMinutes] = useState("00");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    setTouchEnd(e.changedTouches[0].clientX);
-    if (touchStart && e.changedTouches[0].clientX) {
-      const distance = touchStart - e.changedTouches[0].clientX;
-      if (Math.abs(distance) > 50) {
-        if (distance > 0 && expandedTask) {
-          setClosingDetailModal(true);
-          setTimeout(() => {
-            setExpandedTask(null);
-            setClosingDetailModal(false);
-          }, 300);
-        } else if (distance < 0 && selectedHour) {
-          setClosingHourModal(true);
-          setTimeout(() => {
-            setSelectedHour(null);
-            setClosingHourModal(false);
-          }, 300);
-        }
-      }
+  useEffect(() => {
+    // Initialize selectedDate when component mounts
+    const weekDays = state.weekInfo;
+    const dayDate = weekDays.find((d) => d.digit === digit)?.date;
+    if (dayDate) {
+      setSelectedDate(dayDate);
     }
+  }, [digit]);
+
+  const SWIPE_THRESHOLD = 50;
+  const ANIMATION_DURATION = 300;
+
+  const closeModal = (
+    setClosing: (val: boolean) => void,
+    setState: (val: any) => void,
+    newValue: any,
+  ) => {
+    setClosing(true);
+    setTimeout(() => {
+      setState(newValue);
+      setClosing(false);
+    }, ANIMATION_DURATION);
   };
+
+  // const handleTouchStart = (e: React.TouchEvent) => {
+  //   setTouchStart(e.targetTouches[0].clientX);
+  // };
+
+  // const handleTouchEnd = (e: React.TouchEvent) => {
+  //   setTouchEnd(e.changedTouches[0].clientX);
+  //   if (touchStart && e.changedTouches[0].clientX) {
+  //     const distance = touchStart - e.changedTouches[0].clientX;
+  //     if (Math.abs(distance) > SWIPE_THRESHOLD) {
+  //       if (distance > 0 && expandedTask) {
+  //         closeDetailModal();
+  //       } else if (distance < 0 && selectedHour) {
+  //         closeHourModal();
+  //       }
+  //     }
+  //   }
+  // };
 
   const closeHourModal = () => {
-    setClosingHourModal(true);
-    setTimeout(() => {
-      setSelectedHour(null);
-      setClosingHourModal(false);
-    }, 300);
+    closeModal(setClosingHourModal, setSelectedHour, null);
   };
 
   const closeDetailModal = () => {
-    setClosingDetailModal(true);
-    setTimeout(() => {
-      setExpandedTask(null);
-      setClosingDetailModal(false);
-    }, 300);
+    closeModal(setClosingDetailModal, setExpandedTask, null);
+  };
+
+  const handleDeleteTask = async () => {
+    if (!expandedTask) return;
+
+    await axios.delete(
+      `http://85.239.43.136:8000/notifications/${expandedTask.id}`,
+    );
+    // Find and remove the task from the list - match by exact date and name
+    const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
+      return !(task.id === expandedTask.id);
+    });
+
+    state.actionsDataOnCurrentWeek = updatedTasks;
+    updateAppState(updatedTasks);
+
+    closeDetailModal();
+  };
+
+  const handleCompleteTask = async () => {
+    if (!expandedTask) return;
+    await axios.patch(
+      `http://85.239.43.136:8000/notifications/${expandedTask.id}`,
+      { status: "completed" },
+    );
+
+    // todo - надо сделать чтобы таски хранились key-value и доставать их по ключу
+    state.actionsDataOnCurrentWeek.forEach((t) => {
+      if (t.id === expandedTask.id) {
+        t.status = "completed";
+      }
+    });
+
+    updateAppState(state.actionsDataOnCurrentWeek);
+
+    closeDetailModal();
+  };
+
+  const getDayDate = () => {
+    return state.weekInfo.find((d) => d.digit === digit)?.date || null;
+  };
+
+  const formatDateWithTz = (date: Date) => {
+    const tzOffset = date.getTimezoneOffset();
+    const tzString = `${String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, "0")}:${String(Math.abs(tzOffset) % 60).padStart(2, "0")}`;
+    const sign = tzOffset <= 0 ? "+" : "-";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const h = String(date.getHours()).padStart(2, "0");
+    const m = String(date.getMinutes()).padStart(2, "0");
+    const s = String(date.getSeconds()).padStart(2, "0");
+
+    return {
+      dateWithTz: `${year}-${month}-${day}T${h}:${m}:${s}${sign}${tzString}`,
+      time: `${h}:${m}`,
+      date: `${day}-${month}-${year}`,
+    };
+  };
+
+  const openCreateModal = () => {
+    setSelectedDate(getDayDate());
+    setTaskDescription("");
+    setTaskMinutes("00");
+    setShowCreateModal(true);
+  };
+
+  const closeCreateModal = () => {
+    closeModal(setClosingCreateModal, setShowCreateModal, false);
+  };
+
+  const addTaskToState = (newTask: any) => {
+    const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
+    state.actionsDataOnCurrentWeek = updatedTasks;
+    updateAppState(updatedTasks);
+  };
+
+  const handleSaveTask = async () => {
+    if (!taskDescription.trim() || !selectedDate || !selectedHour) return;
+
+    const newDate = new Date(selectedDate);
+    newDate.setHours(parseInt(selectedHour), parseInt(taskMinutes), 0, 0);
+
+    const { time, date } = formatDateWithTz(newDate);
+
+    try {
+      const response = await axios.post("http://85.239.43.136:8000/notifications", {
+        chatId: state.userInfo?.chatId || "",
+        text: taskDescription,
+        time,
+        date,
+      });
+
+      const newTask: TaskI = {
+        date: response.data.time,
+        name: response.data.text,
+        status: response.data.status,
+        id: response.data.id,
+      };
+
+      addTaskToState(newTask);
+    } catch (error) {
+      console.error("Error saving task:", error);
+    }
+
+    closeCreateModal();
+    setTaskDescription("");
+    setTaskMinutes("00");
   };
   const hours = [
     "00",
@@ -83,50 +209,99 @@ export const DayC = ({
     "23",
   ];
 
+  // Check if this is today's date
+  const today = new Date();
+  const isToday =
+    selectedDate &&
+    selectedDate.getDate() === today.getDate() &&
+    selectedDate.getMonth() === today.getMonth() &&
+    selectedDate.getFullYear() === today.getFullYear();
+  let dayNameclassName = "dayName";
+
+  if (isToday) {
+    dayNameclassName += " today-name ";
+  }
+
   let digitDiv = (
-    <div key={"dayName" + dayName + digit} className="dayName">
+    <div key={"dayName" + dayName + digit} className={dayNameclassName}>
       {digit || 333}
     </div>
   );
   let dayNameDiv = (
-    <div key={"dayName" + dayName} className="dayName">
+    <div key={"dayName" + dayName} className={dayNameclassName}>
       {dayName}
     </div>
   );
   let hoursDivs = [digitDiv, dayNameDiv];
-  for (let i = hours.length - 1; i >= 0; --i) {
 
+  for (let i = hours.length - 1; i >= 0; --i) {
     const h = hours[i];
 
     const hourActions = state.actionsDataOnCurrentWeek.filter((a) => {
       try {
-        const actionDate = new Date(a.date);
-        const actionHour = String(a.date).split("T")[1]?.split(":")[0];
-        return actionDate.getDate() === digit && actionHour === h;
-      } catch {
+        console.log("Filtering task:", a);
+        // Parse hour directly from ISO string (before timezone info)
+        const timePart = a.date.split("T")[1];
+        const actionHour = timePart?.split(":")[0];
+
+        // Parse date part
+        const datePart = a.date.split("T")[0];
+        const [year, month, day] = datePart.split("-").map(Number);
+
+        // Create a date object for comparison
+        const actionDate = new Date(year, month - 1, day);
+        const currentDayDate = new Date(
+          selectedDate?.getFullYear() || 0,
+          selectedDate?.getMonth() || 0,
+          digit,
+        );
+
+        console.log(
+          "Task hour:",
+          actionHour,
+          "Current hour:",
+          h,
+          "Task date:",
+          actionDate,
+          "Current date:",
+          currentDayDate,
+        );
+
+        return (
+          actionDate.getTime() === currentDayDate.getTime() && actionHour === h
+        );
+      } catch (e) {
+        console.error("Filter error:", e);
         return false;
       }
     });
 
-    let className = 'hour';
+    let className = "hour";
     // if (hourActions.length) {
     //   className += ' busy'
     // };
 
     const displayDots = hourActions.slice(0, 3);
     const remainingCount = hourActions.length > 3 ? hourActions.length - 3 : 0;
+    if (isToday) {
+      className += " today-hour";
+    }
 
     const divHour = (
       <div
         key={"hour" + h}
         className={className}
         onClick={() => setSelectedHour(h)}
-        style={{ cursor: hourActions.length > 0 ? 'pointer' : 'default' }}
+        style={{ cursor: hourActions.length > 0 ? "pointer" : "default" }}
       >
-        {displayDots.map((_, idx) => (
-          <div key={idx} className="busyHour"></div>
-        ))}
-        {remainingCount > 0 && <span className="busyHourMore">+{remainingCount}</span>}
+        {displayDots.map((v, idx) => {
+          const taskClass =
+            v.status === "completed" ? "completedTask" : "inProcessingTask";
+          return <div key={idx} className={`busyHour ${taskClass}`}></div>;
+        })}
+        {remainingCount > 0 && (
+          <span className="busyHourMore">+{remainingCount}</span>
+        )}
         {h}
       </div>
     );
@@ -136,9 +311,26 @@ export const DayC = ({
   const selectedHourActions = selectedHour
     ? state.actionsDataOnCurrentWeek.filter((a) => {
         try {
-          const actionDate = new Date(a.date);
-          const actionHour = String(a.date).split("T")[1]?.split(":")[0];
-          return actionDate.getDate() === digit && actionHour === selectedHour;
+          // Parse hour directly from ISO string
+          const timePart = a.date.split("T")[1];
+          const actionHour = timePart?.split(":")[0];
+
+          // Parse date part
+          const datePart = a.date.split("T")[0];
+          const [year, month, day] = datePart.split("-").map(Number);
+
+          // Create a date object for comparison
+          const actionDate = new Date(year, month - 1, day);
+          const currentDayDate = new Date(
+            selectedDate?.getFullYear() || 0,
+            selectedDate?.getMonth() || 0,
+            digit,
+          );
+
+          return (
+            actionDate.getTime() === currentDayDate.getTime() &&
+            actionHour === selectedHour
+          );
         } catch {
           return false;
         }
@@ -150,20 +342,31 @@ export const DayC = ({
       {hoursDivs}
       {selectedHour && (
         <div
-          className={`modal-overlay ${closingHourModal ? 'closing' : ''}`}
+          className={`modal-overlay ${closingHourModal ? "closing" : ""}`}
           onClick={closeHourModal}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          // onTouchStart={handleTouchStart}
+          // onTouchEnd={handleTouchEnd}
         >
-          <div className={`modal-content ${closingHourModal ? 'slide-up' : ''}`} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={`modal-content ${closingHourModal ? "slide-up" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h3>{digit} {dayName} - {selectedHour}:00</h3>
-              <button
-                className="modal-close"
-                onClick={closeHourModal}
-              >
-                ✕
-              </button>
+              <h3>
+                {digit} {dayName} - {selectedHour}:00
+              </h3>
+              <div className="modal-header-buttons">
+                <button
+                  className="add-task-btn-header"
+                  onClick={openCreateModal}
+                  title="Добавить задание"
+                >
+                  +
+                </button>
+                <button className="modal-close" onClick={closeHourModal}>
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="modal-body">
               {selectedHourActions.length > 0 ? (
@@ -177,13 +380,25 @@ export const DayC = ({
                     .map((action, idx) => {
                       const time = action.date.split("T")[1].substring(0, 5);
                       return (
-                        <li key={idx}>
+                        <li
+                          key={idx}
+                          className={
+                            action.status === "completed"
+                              ? "completedTaskList"
+                              : "inProcessingTaskList"
+                          }
+                        >
                           <div className="task-time">{time}</div>
                           <div className="task-name">{action.name}</div>
                           <button
                             className="expand-btn"
                             onClick={() =>
-                              setExpandedTask({ name: action.name, time })
+                              setExpandedTask({
+                                date: action.date,
+                                name: action.name,
+                                id: action.id,
+                                status: action.status,
+                              })
                             }
                             title="Посмотреть полное описание"
                           >
@@ -202,23 +417,115 @@ export const DayC = ({
       )}
       {expandedTask && (
         <div
-          className={`modal-overlay ${closingDetailModal ? 'closing' : ''}`}
+          className={`modal-overlay ${closingDetailModal ? "closing" : ""}`}
           onClick={closeDetailModal}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          // onTouchStart={handleTouchStart}
+          // onTouchEnd={handleTouchEnd}
         >
-          <div className={`modal-content modal-details ${closingDetailModal ? 'slide-right' : ''}`} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={`modal-content modal-details ${closingDetailModal ? "slide-right" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h3>{expandedTask.time} - Описание</h3>
-              <button
-                className="modal-close"
-                onClick={closeDetailModal}
+              <h3>
+                {expandedTask.date.split("T")[1].substring(0, 5)} - Описание
+              </h3>
+              <div
+                className={
+                  expandedTask.status === "completed"
+                    ? "completedTaskDetails"
+                    : "inProcessingTaskDetails"
+                }
               >
-                ✕
-              </button>
+                {expandedTask.status === "completed"
+                  ? "Выполнено"
+                  : "В процессе"}
+              </div>
+              <div className="modal-header-buttons">
+                <button
+                  className="delete-task-btn"
+                  onClick={handleDeleteTask}
+                  title="Удалить задание"
+                >
+                  🗑️
+                </button>
+                <button className="modal-close" onClick={closeDetailModal}>
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="modal-body details-body">
               <p>{expandedTask.name}</p>
+            </div>
+            {expandedTask.status !== "completed" && (
+              <button
+                className="complete-task-btn"
+                onClick={handleCompleteTask}
+              >
+                Выполнить
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+      {showCreateModal && (
+        <div
+          className={`modal-overlay ${closingCreateModal ? "closing" : ""}`}
+          onClick={closeCreateModal}
+          // onTouchStart={handleTouchStart}
+          // onTouchEnd={handleTouchEnd}
+        >
+          <div
+            className={`modal-content modal-create ${closingCreateModal ? "slide-up" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>Новое задание</h3>
+              <button className="modal-close" onClick={closeCreateModal}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Час: {selectedHour}</label>
+              </div>
+              <div className="form-group">
+                <label>Минуты</label>
+                <select
+                  value={taskMinutes}
+                  onChange={(e) =>
+                    setTaskMinutes(e.target.value.padStart(2, "0"))
+                  }
+                  className="task-input"
+                  style={{ height: "40px", fontSize: "14px" }}
+                >
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const minutes = i * 5;
+                    return (
+                      <option key={i} value={String(minutes).padStart(2, "0")}>
+                        {String(minutes).padStart(2, "0")}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Описание задания</label>
+                <textarea
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  placeholder="Введите описание задания..."
+                  className="task-input"
+                  rows={4}
+                />
+              </div>
+              <button
+                className="save-task-btn"
+                onClick={handleSaveTask}
+                disabled={!taskDescription.trim()}
+              >
+                Сохранить
+              </button>
             </div>
           </div>
         </div>

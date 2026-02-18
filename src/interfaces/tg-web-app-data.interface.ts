@@ -1,5 +1,6 @@
 export interface TgAppDataI {
   queryId: string | null;
+  chatId: string | null;
   user: {
     username: string | null;
     firstName: string | null;

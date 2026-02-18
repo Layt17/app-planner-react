@@ -5,6 +5,8 @@ import { MainC } from "./components/main.c";
 import { FooterC } from "./components/footer/footer.c";
 import { TgAppDataI } from "./interfaces/tg-web-app-data.interface";
 import axios from "axios";
+import { NotificationI } from "./interfaces/notification.interface";
+import { TaskI } from "./interfaces/task.interface";
 
 export const local = "ru-RU";
 export const currentDate = new Date();
@@ -46,7 +48,7 @@ export const getWeekDays = (date?: Date) => {
   //gen next 6 days
   for (let i = 0; i < 6; i++) {
     cursorDay = new Date(
-      new Date(cursorDay).setDate(new Date(cursorDay).getDate() + 1)
+      new Date(cursorDay).setDate(new Date(cursorDay).getDate() + 1),
     );
     weekInfo.push({
       dayName: cursorDay.toLocaleDateString(local, { weekday: "short" }),
@@ -69,7 +71,8 @@ export const state = {
   nextCursorDay: currentDate,
   weekInfo: getWeekDays(),
   mainAnimation: "",
-  actionsDataOnCurrentWeek: [] as { date: string, name: string }[],
+  actionsDataOnCurrentWeek: [] as TaskI[],
+  userInfo: null as TgAppDataI | null,
 };
 
 export const updateState = (date?: Date, nextCursorDay?: Date) => {
@@ -90,25 +93,43 @@ function App() {
   useEffect(() => {
     // Перенесите логику с window и асинхронные запросы сюда
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const tgWebAppDataHash = new URLSearchParams(hashParams.get("tgWebAppData") || "");
-    
+    const tgWebAppDataHash = new URLSearchParams(
+      hashParams.get("tgWebAppData") || "",
+    );
+
     const tgData = JSON.parse(tgWebAppDataHash.get("user") || "{}");
-    setUserInfo({
-      queryId: tgWebAppDataHash.get("query_id") || '',
+    const userInfoData = {
+      queryId: tgWebAppDataHash.get("query_id") || "",
+      chatId: tgData?.id || "927408284",
       user: {
-        username: tgData?.username || 'username',
-        firstName: tgData?.first_name || 'firstName',
-        lastName: tgData?.last_name || 'lastName',
-        languageCode: tgData?.language_code || 'language_code',
+        username: tgData?.username || "username",
+        firstName: tgData?.first_name || "firstName",
+        lastName: tgData?.last_name || "lastName",
+        languageCode: tgData?.language_code || "language_code",
         isPremium: tgData?.is_premium || false,
       },
-    });
+    };
+    state.userInfo = userInfoData;
+    setUserInfo(userInfoData);
 
     // Асинхронный запрос
-    axios.get("http://localhost:8000/api")
-      .then(response => {
-        state.actionsDataOnCurrentWeek = response.data;
-        setAppState(prev => ({ ...prev, actionsDataOnCurrentWeek: response.data }));
+    axios
+      .get(`http://85.239.43.136:8000/notifications/my-notifs/${state.userInfo?.chatId}`)
+      .then((response) => {
+        const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map((n) => {
+          return {
+            date: new Date(n.time).toISOString(),
+            name: n.text,
+            status: n.status,
+            id: n.id,
+          };
+        });
+
+        state.actionsDataOnCurrentWeek = mappedNotifs;
+        setAppState((prev) => ({
+          ...prev,
+          actionsDataOnCurrentWeek: mappedNotifs,
+        }));
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -116,11 +137,18 @@ function App() {
 
   if (loading) return <div>Loading...</div>;
 
+  const updateAppState = (
+    newTasks: TaskI[],
+  ) => {
+    state.actionsDataOnCurrentWeek = newTasks;
+    setAppState((prev) => ({ ...prev, actionsDataOnCurrentWeek: newTasks }));
+  };
+
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
       <HeaderC userInfo={userInfo!} />
-      <MainC />
+      <MainC updateAppState={updateAppState} />
       <FooterC updateStateApp={setAppState} />
     </div>
   );
