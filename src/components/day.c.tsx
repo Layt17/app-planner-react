@@ -78,7 +78,7 @@ export const DayC = ({
     if (!expandedTask) return;
 
     await axios.delete(
-      `http://localhost:8000/notifications/${expandedTask.id}`,
+      `http://85.239.43.136:8000/notifications/${expandedTask.id}`,
     );
     // Find and remove the task from the list - match by exact date and name
     const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
@@ -94,7 +94,7 @@ export const DayC = ({
   const handleCompleteTask = async () => {
     if (!expandedTask) return;
     await axios.patch(
-      `http://localhost:8000/notifications/${expandedTask.id}`,
+      `http://85.239.43.136:8000/notifications/${expandedTask.id}`,
       { status: "completed" },
     );
 
@@ -159,8 +159,8 @@ export const DayC = ({
     const { time, date } = formatDateWithTz(newDate);
 
     try {
-      const response = await axios.post("http://localhost:8000/notifications", {
-        chatId: "927408284",
+      const response = await axios.post("http://85.239.43.136:8000/notifications", {
+        chatId: state.userInfo?.chatId || "",
         text: taskDescription,
         time,
         date,

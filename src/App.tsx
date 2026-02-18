@@ -72,6 +72,7 @@ export const state = {
   weekInfo: getWeekDays(),
   mainAnimation: "",
   actionsDataOnCurrentWeek: [] as TaskI[],
+  userInfo: null as TgAppDataI | null,
 };
 
 export const updateState = (date?: Date, nextCursorDay?: Date) => {
@@ -97,8 +98,9 @@ function App() {
     );
 
     const tgData = JSON.parse(tgWebAppDataHash.get("user") || "{}");
-    setUserInfo({
+    const userInfoData = {
       queryId: tgWebAppDataHash.get("query_id") || "",
+      chatId: tgData?.id || "927408284",
       user: {
         username: tgData?.username || "username",
         firstName: tgData?.first_name || "firstName",
@@ -106,11 +108,13 @@ function App() {
         languageCode: tgData?.language_code || "language_code",
         isPremium: tgData?.is_premium || false,
       },
-    });
+    };
+    state.userInfo = userInfoData;
+    setUserInfo(userInfoData);
 
     // Асинхронный запрос
     axios
-      .get("http://localhost:8000/notifications/my-notifs/927408284")
+      .get(`http://85.239.43.136:8000/notifications/my-notifs/${userInfo?.chatId}`)
       .then((response) => {
         const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map((n) => {
           return {
