@@ -114,7 +114,7 @@ function App() {
 
     // Асинхронный запрос
     axios
-      .get(`http://85.239.43.136:8000/notifications/my-notifs/${userInfo?.chatId}`)
+      .get(`http://85.239.43.136:8000/notifications/my-notifs/${state.userInfo?.chatId}`)
       .then((response) => {
         const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map((n) => {
           return {
