@@ -23,6 +23,7 @@ jobs:
 
       - name: Build React app
         env:
+          CI: false
           REACT_APP_BACKEND_HOST: ${{ vars.REACT_APP_BACKEND_HOST }}
         run: yarn build
 
