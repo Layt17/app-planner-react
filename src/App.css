@@ -525,7 +525,7 @@
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 16px;
   font-family: Arial, sans-serif;
   background-color: #fff;
 }
@@ -540,7 +540,7 @@
 .task-input[type="text"],
 .task-input select {
   max-height: 40px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 select.task-input {
