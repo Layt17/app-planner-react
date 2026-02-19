@@ -89,18 +89,25 @@ function App() {
   const [appState, setAppState] = useState(state);
   const [userInfo, setUserInfo] = useState<TgAppDataI | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isTg, setIsTg] = useState(true);
 
   useEffect(() => {
-    // Перенесите логику с window и асинхронные запросы сюда
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const tgWebAppDataHash = new URLSearchParams(
       hashParams.get("tgWebAppData") || "",
     );
 
     const tgData = JSON.parse(tgWebAppDataHash.get("user") || "{}");
+
+    if (!tgData.id) {
+      setIsTg(false);
+      setLoading(false);
+      return;
+    }
+
     const userInfoData = {
       queryId: tgWebAppDataHash.get("query_id") || "",
-      chatId: tgData?.id || "927408284",
+      chatId: tgData?.id,
       user: {
         username: tgData?.username || "username",
         firstName: tgData?.first_name || "firstName",
@@ -114,16 +121,18 @@ function App() {
 
     // Асинхронный запрос
     axios
-      .get(`${process.env.REACT_APP_BACKEND_HOST}/notifications/my-notifs/${state.userInfo?.chatId}`)
+      .get(
+        `${process.env.REACT_APP_BACKEND_HOST}/notifications/my-notifs/${state.userInfo?.chatId}`,
+      )
       .then((response) => {
-        const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map((n) => {
-          return {
+        const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map(
+          (n) => ({
             date: new Date(n.time).toISOString(),
             name: n.text,
             status: n.status,
             id: n.id,
-          };
-        });
+          }),
+        );
 
         state.actionsDataOnCurrentWeek = mappedNotifs;
         setAppState((prev) => ({
@@ -135,20 +144,41 @@ function App() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  // Если не Telegram — показываем кнопку
+  if (!isTg) {
+    return (
+      <div className="not-tg" style={{ textAlign: "center", marginTop: "50px" }}>
+        <h2>Откройте приложение через Telegram</h2>
+        <a
+          href={process.env.REACT_APP_TG_BOT_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "inline-block",
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "#0088cc",
+            color: "#fff",
+            borderRadius: "5px",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          Открыть Telegram-бот
+        </a>
+      </div>
+    );
+  }
 
-  const updateAppState = (
-    newTasks: TaskI[],
-  ) => {
-    state.actionsDataOnCurrentWeek = newTasks;
-    setAppState((prev) => ({ ...prev, actionsDataOnCurrentWeek: newTasks }));
-  };
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
       <HeaderC userInfo={userInfo!} />
-      <MainC updateAppState={updateAppState} />
+      <MainC updateAppState={(tasks) =>
+        setAppState((prev) => ({ ...prev, actionsDataOnCurrentWeek: tasks }))
+      } />
       <FooterC updateStateApp={setAppState} />
     </div>
   );
