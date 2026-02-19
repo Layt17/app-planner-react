@@ -88,7 +88,7 @@ export const DayC = ({
     if (!expandedTask) return;
 
     await axios.delete(
-      `https://goalify.ru/api/notifications/${expandedTask.id}`,
+      `${process.env.REACT_APP_BACKEND_HOST}/notifications/${expandedTask.id}`,
     );
     // Find and remove the task from the list - match by exact date and name
     const updatedTasks = state.actionsDataOnCurrentWeek.filter((task) => {
@@ -104,7 +104,7 @@ export const DayC = ({
   const handleCompleteTask = async () => {
     if (!expandedTask) return;
     await axios.patch(
-      `https://goalify.ru/api/notifications/${expandedTask.id}`,
+      `${process.env.REACT_APP_BACKEND_HOST}/notifications/${expandedTask.id}`,
       { status: "completed" },
     );
 
@@ -169,7 +169,7 @@ export const DayC = ({
     const { time, date } = formatDateWithTz(newDate);
 
     try {
-      const response = await axios.post("https://goalify.ru/api/notifications", {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/notifications`, {
         chatId: state.userInfo?.chatId || "",
         text: taskDescription,
         time,
@@ -256,7 +256,6 @@ export const DayC = ({
 
     const hourActions = state.actionsDataOnCurrentWeek.filter((a) => {
       try {
-        console.log("Filtering task:", a);
         // Parse hour directly from ISO string (before timezone info)
         const timePart = a.date.split("T")[1];
         const actionHour = timePart?.split(":")[0];
@@ -271,17 +270,6 @@ export const DayC = ({
           selectedDate?.getFullYear() || 0,
           selectedDate?.getMonth() || 0,
           digit,
-        );
-
-        console.log(
-          "Task hour:",
-          actionHour,
-          "Current hour:",
-          h,
-          "Task date:",
-          actionDate,
-          "Current date:",
-          currentDayDate,
         );
 
         return (

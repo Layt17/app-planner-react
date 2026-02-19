@@ -114,7 +114,7 @@ function App() {
 
     // Асинхронный запрос
     axios
-      .get(`https://goalify.ru/api/notifications/my-notifs/${state.userInfo?.chatId}`)
+      .get(`${process.env.REACT_APP_BACKEND_HOST}/notifications/my-notifs/${state.userInfo?.chatId}`)
       .then((response) => {
         const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map((n) => {
           return {
