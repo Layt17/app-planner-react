@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { HeaderC } from "./components/header/header.c";
 import { MainC } from "./components/main.c";
 import { FooterC } from "./components/footer/footer.c";
@@ -90,6 +90,64 @@ function App() {
   const [userInfo, setUserInfo] = useState<TgAppDataI | null>(null);
   const [loading, setLoading] = useState(true);
   const [isTg, setIsTg] = useState(true);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+
+  const handleNavigateWeek = (direction: 'left' | 'right') => {
+    if (direction === 'left') {
+      const prevCursorDay = new Date(state.weekInfo[0].date);
+      const nextCursorDay = new Date(prevCursorDay).setDate(
+        prevCursorDay.getDate() - 1,
+      );
+      state.weekInfo = getWeekDays(new Date(nextCursorDay));
+      state.mainAnimation = "leftSlide";
+    } else {
+      const prevCursorDay = new Date(state.weekInfo[6].date);
+      const nextCursorDay = new Date(prevCursorDay).setDate(
+        prevCursorDay.getDate() + 1,
+      );
+      state.weekInfo = getWeekDays(new Date(nextCursorDay));
+      state.mainAnimation = "rightSlide";
+    }
+    setAppState((prev) => ({
+      ...prev,
+      weekInfo: [...state.weekInfo],
+      mainAnimation: state.mainAnimation,
+    }));
+  };
+
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const deltaX = touchEndX - touchStartX.current;
+    const deltaY = touchEndY - touchStartY.current;
+
+    const minSwipeDistance = 50;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+      if (deltaX > 0) {
+        handleNavigateWeek('left');
+      } else {
+        handleNavigateWeek('right');
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("touchstart", handleTouchStart as EventListener);
+    window.addEventListener("touchend", handleTouchEnd as EventListener);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart as EventListener);
+      window.removeEventListener("touchend", handleTouchEnd as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
