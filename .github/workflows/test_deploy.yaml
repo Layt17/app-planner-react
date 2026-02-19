@@ -58,4 +58,4 @@ jobs:
             ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.PROJECT_FOLDER }}
 
       - name: Success
-        run: echo "🚀 React app dep
+        run: echo "🚀 React app dep"
