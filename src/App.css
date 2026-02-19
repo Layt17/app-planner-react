@@ -86,37 +86,11 @@
   position: absolute;
   top: 5%;
   height: 85%;
-  width: 100%;
+  width: 300%;
   font-size: 15;
   background-color: rgb(238, 240, 239);
-}
-
-.leftSlide {
-  transform: translateX(-150%);
-  animation: leftSlide 1s forwards;
-}
-
-@keyframes leftSlide {
-  0% {
-    transform: translateX(-150%);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-.rightSlide {
-  transform: translateX(-150%);
-  animation: rightSlide 1s forwards;
-}
-
-@keyframes rightSlide {
-  0% {
-    transform: translateX(150%);
-  }
-  100% {
-    transform: translateX(0);
-  }
+  transform: translateX(-100%);
+  display: flex;
 }
 
 #leftArrowButton {

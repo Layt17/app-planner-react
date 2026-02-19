@@ -5,27 +5,47 @@ type Props = {
 };
 export const FooterC = (props: Props & object) => {
   const handleClickLeft = () => {
-    const prevCursorDay = new Date(state.weekInfo[0].date);
+    const mainElement = document.getElementById("main");
+    if (mainElement) {
+      mainElement.style.transition = "transform 0.4s ease-out";
+      mainElement.style.transform = "translateX(0)";
+    }
 
+    const prevCursorDay = new Date(state.weekInfo[0].date);
     const nextCursorDay = new Date(prevCursorDay).setDate(
       prevCursorDay.getDate() - 1,
     );
 
-    state.weekInfo = getWeekDays(new Date(nextCursorDay));
-    state.mainAnimation = "leftSlide";
-    props.updateStateApp(state.weekInfo);
+    setTimeout(() => {
+      state.weekInfo = getWeekDays(new Date(nextCursorDay));
+      props.updateStateApp(state.weekInfo);
+      if (mainElement) {
+        mainElement.style.transition = "none";
+        mainElement.style.transform = "translateX(-100%)";
+      }
+    }, 400);
   };
 
   const handleClickRight = () => {
-    const prevCursorDay = new Date(state.weekInfo[6].date);
+    const mainElement = document.getElementById("main");
+    if (mainElement) {
+      mainElement.style.transition = "transform 0.4s ease-out";
+      mainElement.style.transform = "translateX(-200%)";
+    }
 
+    const prevCursorDay = new Date(state.weekInfo[6].date);
     const nextCursorDay = new Date(prevCursorDay).setDate(
       prevCursorDay.getDate() + 1,
     );
 
-    state.weekInfo = getWeekDays(new Date(nextCursorDay));
-    state.mainAnimation = "rightSlide";
-    props.updateStateApp(state.weekInfo);
+    setTimeout(() => {
+      state.weekInfo = getWeekDays(new Date(nextCursorDay));
+      props.updateStateApp(state.weekInfo);
+      if (mainElement) {
+        mainElement.style.transition = "none";
+        mainElement.style.transform = "translateX(-100%)";
+      }
+    }, 400);
   };
 
   const handleClickToday = () => {

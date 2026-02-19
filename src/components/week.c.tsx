@@ -1,15 +1,20 @@
-import { state } from "../App";
 import { DayC } from "./day.c";
 
+interface WeekDayInfo {
+  dayName: string;
+  digit: number;
+  date: Date;
+}
+
 export const WeekC = ({
+  weekInfo,
   updateAppState,
 }: {
+  weekInfo: WeekDayInfo[];
   updateAppState: (
     tasks: { date: string; name: string; status: string }[],
   ) => void;
 }) => {
-  const weekInfo = state.weekInfo;
-
   return (
     <div className="week">
       {weekInfo.map((d) => {

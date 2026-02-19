@@ -100,19 +100,16 @@ function App() {
         prevCursorDay.getDate() - 1,
       );
       state.weekInfo = getWeekDays(new Date(nextCursorDay));
-      state.mainAnimation = "leftSlide";
     } else {
       const prevCursorDay = new Date(state.weekInfo[6].date);
       const nextCursorDay = new Date(prevCursorDay).setDate(
         prevCursorDay.getDate() + 1,
       );
       state.weekInfo = getWeekDays(new Date(nextCursorDay));
-      state.mainAnimation = "rightSlide";
     }
     setAppState((prev) => ({
       ...prev,
       weekInfo: [...state.weekInfo],
-      mainAnimation: state.mainAnimation,
     }));
   };
 
@@ -135,7 +132,10 @@ function App() {
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       const mainElement = document.getElementById("main");
       if (mainElement) {
-        mainElement.style.transform = `translateX(${deltaX}px)`;
+        mainElement.style.transition = "none";
+        // Смещаем контейнер на 100% влево (текущая неделя в центре)
+        // + добавляем смещение от пользователя
+        mainElement.style.transform = `translateX(calc(-100% + ${deltaX}px))`;
       }
     }
   };
@@ -148,24 +148,29 @@ function App() {
     const deltaY = touchEndY - touchStartY.current;
 
     const minSwipeDistance = 50;
-
     const mainElement = document.getElementById("main");
-    if (mainElement) {
-      mainElement.style.transition = "transform 0.3s ease-out";
-      mainElement.style.transform = "translateX(0)";
-    }
 
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
-      setTimeout(() => {
+    if (mainElement) {
+      mainElement.style.transition = "transform 0.4s ease-out";
+
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
         if (deltaX > 0) {
+          // Свайп вправо - показываем предыдущую неделю
           handleNavigateWeek('left');
+          mainElement.style.transform = "translateX(0)";
         } else {
+          // Свайп влево - показываем следующую неделю
           handleNavigateWeek('right');
+          mainElement.style.transform = "translateX(-200%)";
         }
-        if (mainElement) {
-          mainElement.style.transition = "";
-        }
-      }, 150);
+      } else {
+        // Возвращаемся к текущей неделе
+        mainElement.style.transform = "translateX(-100%)";
+      }
+
+      setTimeout(() => {
+        mainElement.style.transition = "none";
+      }, 400);
     }
   };
 
