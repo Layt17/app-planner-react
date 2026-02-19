@@ -25,6 +25,7 @@ jobs:
         env:
           CI: false
           REACT_APP_BACKEND_HOST: ${{ vars.REACT_APP_BACKEND_HOST }}
+          REACT_APP_TG_BOT_LINK: ${{ vars.REACT_APP_TG_BOT_LINK }}
         run: yarn build
 
       - name: Upload build
