@@ -544,7 +544,7 @@ export const DayC = ({
                     setTaskMinutes(e.target.value.padStart(2, "0"))
                   }
                   className="task-input"
-                  style={{ height: "40px", fontSize: "14px" }}
+                  style={{ height: "40px" }}
                 >
                   {Array.from({ length: 12 }, (_, i) => {
                     const minutes = i * 5;

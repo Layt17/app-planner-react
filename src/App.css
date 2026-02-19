@@ -548,6 +548,7 @@ select.task-input {
   height: auto;
   max-height: 200px;
   overflow-y: auto;
+  font-size: 16px;
 }
 
 textarea.task-input {
