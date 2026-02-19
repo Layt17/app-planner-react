@@ -1,0 +1,60 @@
+name: Frontend Deploy (CRA)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build React app
+        env:
+          REACT_APP_BACKEND_HOST: ${{ vars.REACT_APP_BACKEND_HOST }}
+        run: yarn build
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-build
+          path: build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: react-build
+          path: build
+
+      - name: Setup SSH
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ vars.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          rsync -avz --delete \
+            build/ \
+            ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.PROJECT_FOLDER }}
+
+      - name: Success
+        run: echo "🚀 React app dep
