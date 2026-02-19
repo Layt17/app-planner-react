@@ -119,6 +119,25 @@ function App() {
   const handleTouchStart = (e: TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
+    state.mainAnimation = "";
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (e.touches.length === 0) return;
+
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+
+    const deltaX = currentX - touchStartX.current;
+    const deltaY = currentY - touchStartY.current;
+
+    // Только двигаем, если свайп более горизонтальный
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      const mainElement = document.getElementById("main");
+      if (mainElement) {
+        mainElement.style.transform = `translateX(${deltaX}px)`;
+      }
+    }
   };
 
   const handleTouchEnd = (e: TouchEvent) => {
@@ -130,21 +149,34 @@ function App() {
 
     const minSwipeDistance = 50;
 
+    const mainElement = document.getElementById("main");
+    if (mainElement) {
+      mainElement.style.transition = "transform 0.3s ease-out";
+      mainElement.style.transform = "translateX(0)";
+    }
+
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
-      if (deltaX > 0) {
-        handleNavigateWeek('left');
-      } else {
-        handleNavigateWeek('right');
-      }
+      setTimeout(() => {
+        if (deltaX > 0) {
+          handleNavigateWeek('left');
+        } else {
+          handleNavigateWeek('right');
+        }
+        if (mainElement) {
+          mainElement.style.transition = "";
+        }
+      }, 150);
     }
   };
 
   useEffect(() => {
     window.addEventListener("touchstart", handleTouchStart as EventListener);
+    window.addEventListener("touchmove", handleTouchMove as EventListener);
     window.addEventListener("touchend", handleTouchEnd as EventListener);
 
     return () => {
       window.removeEventListener("touchstart", handleTouchStart as EventListener);
+      window.removeEventListener("touchmove", handleTouchMove as EventListener);
       window.removeEventListener("touchend", handleTouchEnd as EventListener);
     };
   }, []);
