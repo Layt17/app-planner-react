@@ -95,7 +95,7 @@
 
 .leftSlide {
   transform: translateX(-150%);
-  animation: leftSlide 0.3s forwards;
+  animation: leftSlide 0.5s forwards;
 }
 
 @keyframes leftSlide {
@@ -109,7 +109,7 @@
 
 .rightSlide {
   transform: translateX(-150%);
-  animation: rightSlide 0.3s forwards;
+  animation: rightSlide 0.5s forwards;
 }
 
 @keyframes rightSlide {
