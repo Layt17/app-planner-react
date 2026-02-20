@@ -309,7 +309,31 @@ export const DayC = ({
       sparkle.className = "sparkle";
       sparkle.textContent =
         sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
-      sparkle.style.left = window.innerWidth / 2 + "px";
+      sparkle.style.left = window.innerWidth / 3 + "px";
+      sparkle.style.top = "40px";
+      sparkle.style.setProperty("--tx", `${tx}px`);
+      sparkle.style.setProperty("--ty", `${ty}px`);
+      sparkle.style.setProperty(
+        "--duration",
+        `${2 + Math.random() * 1.5}s`
+      );
+
+      document.body.appendChild(sparkle);
+
+      setTimeout(() => sparkle.remove(), 3500);
+    }
+
+    // Салюты сверху (летят вниз)
+    for (let i = 0; i < 25; i++) {
+      const distance = 150 + Math.random() * 250;
+      const tx = (Math.random() - 0.5) * 300; // влево/вправо
+      const ty = distance; // вниз
+
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
+      sparkle.textContent =
+        sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+      sparkle.style.left = window.innerWidth / 3 * 2 + "px";
       sparkle.style.top = "40px";
       sparkle.style.setProperty("--tx", `${tx}px`);
       sparkle.style.setProperty("--ty", `${ty}px`);
