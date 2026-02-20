@@ -194,6 +194,7 @@ export const FloatingStarC = () => {
   // Обработчик клика на кораблик
   const handleStarClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (star && star.visible) {
       const explosionX = star.x + 20;
       const explosionY = star.y + 20;
