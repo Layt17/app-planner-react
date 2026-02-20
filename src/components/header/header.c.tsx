@@ -76,7 +76,7 @@ export const HeaderC = ({ userInfo }: { userInfo: TgAppDataI }) => {
                   value={tempEmoji}
                   onChange={(e) => setTempEmoji(e.target.value)}
                   placeholder="Введите эмодзи"
-                  maxLength={10}
+                  maxLength={5}
                 />
               </div>
               <div className="settings-preview">
