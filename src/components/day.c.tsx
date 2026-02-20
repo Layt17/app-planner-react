@@ -103,8 +103,11 @@ export const DayC = ({
     closeDetailModal();
   };
 
-  const handleCompleteTask = async () => {
+  const handleCompleteTask = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!expandedTask) return;
+
+    createSparkles(e);
+
     await axios.patch(
       `${process.env.REACT_APP_BACKEND_HOST}/notifications/${expandedTask.id}`,
       { status: "completed" },
@@ -215,7 +218,36 @@ export const DayC = ({
     updateAppState(updatedTasks);
   };
 
-  const handleSaveTask = async () => {
+  const createSparkles = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const button = e.currentTarget;
+    const rect = button.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const sparkleEmojis = ["✨", "🎉", "⭐", "💫", "🌟"];
+
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI * 2 * i) / 12;
+      const distance = 100 + Math.random() * 100;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
+      sparkle.textContent =
+        sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+      sparkle.style.left = centerX + "px";
+      sparkle.style.top = centerY + "px";
+      sparkle.style.setProperty("--tx", `${tx}px`);
+      sparkle.style.setProperty("--ty", `${ty}px`);
+
+      document.body.appendChild(sparkle);
+
+      setTimeout(() => sparkle.remove(), 1500);
+    }
+  };
+
+  const handleSaveTask = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!taskDescription.trim() || !selectedDate || !selectedHour) return;
 
     const newDate = new Date(selectedDate);
