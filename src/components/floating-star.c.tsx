@@ -60,7 +60,9 @@ export const FloatingStarC = () => {
       targetY = rect.top + rect.height / 2 - textHeight / 2;
     }
 
-    const newSparkles: Array<TextSparkle & { offsetX: number; offsetY: number }> = [];
+    const newSparkles: Array<
+      TextSparkle & { offsetX: number; offsetY: number }
+    > = [];
     const numSparkles = 1; // Одно слово летит к названию дня
 
     for (let i = 0; i < numSparkles; i++) {
@@ -85,14 +87,15 @@ export const FloatingStarC = () => {
         dayNameElement.style.animation = "none";
         // Trigger reflow to restart animation
         void dayNameElement.offsetWidth;
-        dayNameElement.style.animation = "dayNameGlow 0.6s ease-in-out forwards";
+        dayNameElement.style.animation =
+          "dayNameGlow 0.6s ease-in-out forwards";
       }
     }, 950);
 
     // Удаляем текст после анимации
     setTimeout(() => {
       setTextSparkles((prev) =>
-        prev.filter((s) => !newSparkles.find((ns) => ns.id === s.id))
+        prev.filter((s) => !newSparkles.find((ns) => ns.id === s.id)),
       );
       // Удаляем мерцание со стилей
       if (dayNameElement) {
@@ -181,7 +184,7 @@ export const FloatingStarC = () => {
     // Звезда исчезает через 5.6 сек (0.6s полёт + 5s стояния)
     starVanishTimeoutRef.current = setTimeout(() => {
       setStar((prev) =>
-        prev && prev.id === newStarId ? { ...prev, visible: false } : prev
+        prev && prev.id === newStarId ? { ...prev, visible: false } : prev,
       );
     }, 5600);
 
@@ -217,7 +220,8 @@ export const FloatingStarC = () => {
 
       // Удаляем кораблик
       if (starTimeoutRef.current) clearTimeout(starTimeoutRef.current);
-      if (starVanishTimeoutRef.current) clearTimeout(starVanishTimeoutRef.current);
+      if (starVanishTimeoutRef.current)
+        clearTimeout(starVanishTimeoutRef.current);
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (trailIntervalRef.current) clearInterval(trailIntervalRef.current);
       setStar(null);
@@ -241,7 +245,8 @@ export const FloatingStarC = () => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (starTimeoutRef.current) clearTimeout(starTimeoutRef.current);
-      if (starVanishTimeoutRef.current) clearTimeout(starVanishTimeoutRef.current);
+      if (starVanishTimeoutRef.current)
+        clearTimeout(starVanishTimeoutRef.current);
       if (trailIntervalRef.current) clearInterval(trailIntervalRef.current);
     };
   }, []);
@@ -251,18 +256,20 @@ export const FloatingStarC = () => {
       {star && (
         <button
           className={`floating-star ${star.visible ? "visible" : "hidden"}`}
-          style={{
-            left: "0",
-            top: "0",
-            "--startX": star.startX,
-            "--startY": star.startY,
-            "--endX": star.endX,
-            "--endY": star.endY,
-          } as React.CSSProperties}
+          style={
+            {
+              left: "0",
+              top: "0",
+              "--startX": star.startX,
+              "--startY": star.startY,
+              "--endX": star.endX,
+              "--endY": star.endY,
+            } as React.CSSProperties
+          }
           onClick={handleStarClick}
           onTouchEnd={handleStarClick}
         >
-          ⛵
+          {localStorage.getItem("favoriteEmoji") || "⛵"}
         </button>
       )}
 
@@ -296,14 +303,16 @@ export const FloatingStarC = () => {
           <div
             key={sparkle.id}
             className="text-sparkle"
-            style={{
-              left: `${sparkle.x}px`,
-              top: `${sparkle.y}px`,
-              "--tx": `${sparkle.offsetX}px`,
-              "--ty": `${sparkle.offsetY}px`,
-            } as React.CSSProperties}
+            style={
+              {
+                left: `${sparkle.x}px`,
+                top: `${sparkle.y}px`,
+                "--tx": `${sparkle.offsetX}px`,
+                "--ty": `${sparkle.offsetY}px`,
+              } as React.CSSProperties
+            }
           >
-            молодец!
+            {localStorage.getItem("favoriteWord") || "молодец!"}
           </div>
         );
       })}
