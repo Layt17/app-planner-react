@@ -14,7 +14,6 @@
   position: absolute;
   top: 5%;
   left: 5%;
-  /* font-size: 5%;  */
   font-size: 15;
   font-family: Arial, sans-serif;
 }
@@ -24,10 +23,36 @@
   height: 5%;
   width: 100%;
   font-size: 15;
-  background-color: rgb(206, 240, 240);
-  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  text-align: left;
   place-items: center;
-  border-radius: 5%;
+  border-radius: 0 0 15px 15px;
+  padding-left: 25px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.1;
+}
+
+.header-username {
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.header-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 #footer {
   position: absolute;
@@ -36,7 +61,7 @@
   height: 10%;
   width: 100%;
   font-size: 80%;
-  background-color: rgb(162, 134, 165);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 5%;
 }
@@ -122,51 +147,65 @@
 }
 
 #leftArrowButton {
-  border-radius: 10px;
+  border-radius: 20px;
   position: absolute;
-  top: 10%;
-  left: 5%;
-  height: 80%;
-  width: 15%;
-  font-size: 120%;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: none;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  height: 50px;
+  width: 50px;
+  font-size: 24px;
+  background-color: #f0f0f0;
+  border: 2px solid #e0e0e0;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
 }
 
 #leftArrowButton:hover {
   background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: #d0d0d0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #666;
 }
 
 #leftArrowButton:active {
-  transform: scale(0.95);
+  transform: translateY(-50%) scale(0.95);
 }
 
 #rightArrowButton {
-  border-radius: 10px;
+  border-radius: 20px;
   position: absolute;
-  top: 10%;
-  right: 5%;
-  height: 80%;
-  width: 15%;
-  font-size: 120%;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: none;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  height: 50px;
+  width: 50px;
+  font-size: 24px;
+  background-color: #f0f0f0;
+  border: 2px solid #e0e0e0;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
 }
 
 #rightArrowButton:hover {
   background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: #d0d0d0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #666;
 }
 
 #rightArrowButton:active {
-  transform: scale(0.95);
+  transform: translateY(-50%) scale(0.95);
 }
 .day {
   display: grid;
@@ -207,9 +246,9 @@
 
 .today-name {
   box-shadow: -3px 3px 3px rgba(162, 134, 165, 0.2);
-  background: linear-gradient(135deg, rgb(180, 150, 190), rgb(200, 170, 210));
+  background: #f0f0f0;
   font-weight: 600;
-  color: rgb(255, 255, 255);
+  color: #764ba2;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
@@ -368,7 +407,7 @@
   background-color: white;
   border-radius: 15px 15px 0 0;
   padding: 20px;
-  max-width: 500px;
+  max-width: 100%;
   width: 90%;
   box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.2);
   animation: slideUpFromBottom 0.4s ease-out;
@@ -377,9 +416,9 @@
 
 .modal-content.modal-day {
   max-width: 100%;
-  width: 100%;
+  width: 90%;
+  padding: 20px;
   border-radius: 15px 15px 0 0;
-  padding: 0;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
@@ -397,11 +436,6 @@
   margin-bottom: 15px;
   border-bottom: 2px solid #e0e0e0;
   padding-bottom: 10px;
-}
-
-.modal-content.modal-day .modal-header {
-  margin-bottom: 0;
-  padding: 20px;
   flex-shrink: 0;
 }
 
@@ -433,7 +467,6 @@
 .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
 }
 
 .modal-day .modal-body {
@@ -668,7 +701,6 @@ textarea.task-input {
 .modal-day {
   position: relative;
   width: 90%;
-  max-width: 500px;
   height: auto;
   max-height: 85vh;
   border-radius: 15px 15px 0 0;
