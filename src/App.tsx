@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { HeaderC } from "./components/header/header.c";
 import { MainC } from "./components/main.c";
 import { FooterC } from "./components/footer/footer.c";
+import { FloatingStarC } from "./components/floating-star.c";
 import { TgAppDataI } from "./interfaces/tg-web-app-data.interface";
 import axios from "axios";
 import { NotificationI } from "./interfaces/notification.interface";
@@ -180,6 +181,7 @@ function App() {
   return (
     <div className="App">
       <title>ПЛАНИРОВЩИК</title>
+      <FloatingStarC />
       <HeaderC userInfo={userInfo!} />
       <MainC updateAppState={(tasks) =>
         setAppState((prev) => ({ ...prev, actionsDataOnCurrentWeek: tasks }))

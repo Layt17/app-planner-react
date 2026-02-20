@@ -63,7 +63,7 @@
   font-size: 80%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2);
-  border-radius: 5%;
+  /* border-radius: 5%; */
 }
 #footerDates {
   position: absolute;
@@ -217,10 +217,10 @@
   display: grid;
   place-items: center;
   background-color: #f0f0f0;
-  border-radius: 5%;
+  /* border-radius: 5%; */
 }
 .hour {
-  border-radius: 5%;
+  /* border-radius: 5%; */
   box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.2);
   text-align: center;
   font-size: small;
@@ -261,14 +261,14 @@
 .completedTaskDetails {
   background-color: #d6f3d6;
   border-radius: 5%;
-  width: 20%;
+  width: 30%;
   text-align: center;
 }
 
 .inProcessingTaskDetails {
   background-color: #e5f2ff;
   border-radius: 5%;
-  width: 20%;
+  width: 30%;
   text-align: center;
 }
 .completedTask {
@@ -782,5 +782,179 @@ textarea.task-input {
   to {
     opacity: 0;
     transform: translateY(100%);
+  }
+}
+
+.floating-star {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  font-size: 40px;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5000;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  animation: starFly 0.6s linear forwards;
+}
+
+.floating-star:hover {
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8));
+}
+
+.floating-star:active {
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
+}
+
+.floating-star.visible {
+  animation: starFly 0.6s linear forwards;
+}
+
+.floating-star.hidden {
+  animation: starDisappear 0.3s linear forwards;
+  animation-fill-mode: forwards;
+}
+
+@keyframes starFly {
+  0% {
+    opacity: 1;
+    transform: translate(var(--startX), var(--startY)) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(
+      calc(var(--startX) + (var(--endX) - var(--startX)) * 0.25 + 30px),
+      calc(var(--startY) + (var(--endY) - var(--startY)) * 0.25 - 40px)
+    ) rotate(90deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(
+      calc(var(--startX) + (var(--endX) - var(--startX)) * 0.5 + 40px),
+      calc(var(--startY) + (var(--endY) - var(--startY)) * 0.5 - 80px)
+    ) rotate(180deg);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(
+      calc(var(--startX) + (var(--endX) - var(--startX)) * 0.75 + 20px),
+      calc(var(--startY) + (var(--endY) - var(--startY)) * 0.75 - 40px)
+    ) rotate(270deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(var(--endX), var(--endY)) rotate(360deg);
+  }
+}
+
+@keyframes starDisappear {
+  0% {
+    opacity: 1;
+    transform: translate(var(--endX), var(--endY)) rotate(360deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--endX), var(--endY)) rotate(360deg);
+  }
+}
+
+.explosion {
+  position: fixed;
+  font-size: 60px;
+  pointer-events: none;
+  animation: explosionPop 1s ease-out forwards;
+  z-index: 5002;
+}
+
+@keyframes explosionPop {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+}
+
+.star-trail {
+  position: fixed;
+  font-size: 20px;
+  pointer-events: none;
+  animation: trailFade 1s ease-out forwards;
+  z-index: 4999;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4));
+}
+
+@keyframes trailFade {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+.text-sparkle {
+  position: fixed;
+  pointer-events: none;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 5001;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+  color: #020202;
+  animation: textFly 1s linear forwards;
+}
+
+@keyframes textFly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(0.7);
+  }
+  99% {
+    opacity: 1;
+    transform: translate(var(--tx), var(--ty)) scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0);
+  }
+}
+
+@keyframes dayNameGlow {
+  0% {
+    background-color: #f0f0f0;
+    box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+  }
+  25% {
+    background-color: #fff9e6;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  }
+  50% {
+    background-color: #fffacc;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+  }
+  75% {
+    background-color: #fff9e6;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  }
+  100% {
+    background-color: #f0f0f0;
+    box-shadow: 0 0 0 rgba(255, 215, 0, 0);
   }
 }
