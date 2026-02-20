@@ -20,6 +20,8 @@ export const DayC = ({
   const [closingDetailModal, setClosingDetailModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [closingCreateModal, setClosingCreateModal] = useState(false);
+  const [showDayModal, setShowDayModal] = useState(false);
+  const [closingDayModal, setClosingDayModal] = useState(false);
   const [taskDescription, setTaskDescription] = useState("");
   const [taskMinutes, setTaskMinutes] = useState("00");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -124,6 +126,55 @@ export const DayC = ({
     return state.weekInfo.find((d) => d.digit === digit)?.date || null;
   };
 
+  const getDayTasks = () => {
+    return state.actionsDataOnCurrentWeek
+      .filter((a) => {
+        try {
+          const datePart = a.date.split("T")[0];
+          const [year, month, day] = datePart.split("-").map(Number);
+          const actionDate = new Date(year, month - 1, day);
+          const currentDayDate = new Date(
+            selectedDate?.getFullYear() || 0,
+            selectedDate?.getMonth() || 0,
+            digit,
+          );
+          return actionDate.getTime() === currentDayDate.getTime();
+        } catch {
+          return false;
+        }
+      })
+      .sort((a, b) => {
+        const timeA = a.date.split("T")[1];
+        const timeB = b.date.split("T")[1];
+        return timeB.localeCompare(timeA);
+      });
+  };
+
+  const formatFullDate = () => {
+    if (!selectedDate) return "";
+    const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    const months = [
+      "января",
+      "февраля",
+      "марта",
+      "апреля",
+      "мая",
+      "июня",
+      "июля",
+      "августа",
+      "сентября",
+      "октября",
+      "ноября",
+      "декабря",
+    ];
+    const dayOfWeek =
+      days[selectedDate.getDay() === 0 ? 6 : selectedDate.getDay() - 1];
+    const day = selectedDate.getDate();
+    const month = months[selectedDate.getMonth()];
+    const year = selectedDate.getFullYear();
+    return `${dayOfWeek} ${day} ${month} ${year}г`;
+  };
+
   const formatDateWithTz = (date: Date) => {
     const tzOffset = date.getTimezoneOffset();
     const tzString = `${String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, "0")}:${String(Math.abs(tzOffset) % 60).padStart(2, "0")}`;
@@ -154,6 +205,10 @@ export const DayC = ({
     closeModal(setClosingCreateModal, setShowCreateModal, false);
   };
 
+  const closeDayModal = () => {
+    closeModal(setClosingDayModal, setShowDayModal, false);
+  };
+
   const addTaskToState = (newTask: any) => {
     const updatedTasks = [...state.actionsDataOnCurrentWeek, newTask];
     state.actionsDataOnCurrentWeek = updatedTasks;
@@ -169,12 +224,15 @@ export const DayC = ({
     const { time, date } = formatDateWithTz(newDate);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/notifications`, {
-        chatId: state.userInfo?.chatId || "",
-        text: taskDescription,
-        time,
-        date,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_HOST}/notifications`,
+        {
+          chatId: state.userInfo?.chatId || "",
+          text: taskDescription,
+          time,
+          date,
+        },
+      );
 
       const newTask: TaskI = {
         date: response.data.time,
@@ -240,12 +298,22 @@ export const DayC = ({
   }
 
   let digitDiv = (
-    <div key={"dayName" + dayName + digit} className={dayNameclassName}>
+    <div
+      key={"dayName" + dayName + digit}
+      className={dayNameclassName}
+      onClick={() => setShowDayModal(true)}
+      style={{ cursor: "pointer" }}
+    >
       {digit || 333}
     </div>
   );
   let dayNameDiv = (
-    <div key={"dayName" + dayName} className={dayNameclassName}>
+    <div
+      key={"dayName" + dayName}
+      className={dayNameclassName}
+      onClick={() => setShowDayModal(true)}
+      style={{ cursor: "pointer" }}
+    >
       {dayName}
     </div>
   );
@@ -464,7 +532,7 @@ export const DayC = ({
       )}
       {expandedTask && (
         <div
-          className={`modal-overlay ${closingDetailModal ? "closing" : ""}`}
+          className={`modal-overlay ${showDayModal ? "details-on-day" : ""} ${closingDetailModal ? "closing" : ""}`}
           onClick={closeDetailModal}
           // onTouchStart={handleTouchStart}
           // onTouchEnd={handleTouchEnd}
@@ -573,6 +641,62 @@ export const DayC = ({
               >
                 Сохранить
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDayModal && (
+        <div
+          className={`modal-overlay day-modal-overlay ${closingDayModal ? "closing" : ""}`}
+          onClick={closeDayModal}
+        >
+          <div
+            className={`modal-content modal-day ${closingDayModal ? "slide-down" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>{formatFullDate()}</h3>
+              <button className="modal-close" onClick={closeDayModal}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              {getDayTasks().length > 0 ? (
+                <ul>
+                  {getDayTasks().map((action, idx) => {
+                    const time = action.date.split("T")[1].substring(0, 5);
+                    return (
+                      <li
+                        key={idx}
+                        className={
+                          action.status === "completed"
+                            ? "completedTaskList"
+                            : "inProcessingTaskList"
+                        }
+                      >
+                        <div className="task-time">{time}</div>
+                        <div className="task-name">{action.name}</div>
+                        <button
+                          className="expand-btn"
+                          onClick={() =>
+                            setExpandedTask({
+                              date: action.date,
+                              name: action.name,
+                              id: action.id,
+                              status: action.status,
+                            })
+                          }
+                          title="Посмотреть полное описание"
+                        >
+                          ➤
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p>Нет заданий на этот день</p>
+              )}
             </div>
           </div>
         </div>

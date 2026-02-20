@@ -96,8 +96,13 @@ function App() {
     const tgWebAppDataHash = new URLSearchParams(
       hashParams.get("tgWebAppData") || "",
     );
-
+    
     const tgData = JSON.parse(tgWebAppDataHash.get("user") || "{}");
+    
+    // local
+    if (process.env.REACT_APP_ENV === 'local'){
+      tgData['id'] = '927408284';
+    }
 
     if (!tgData.id) {
       setIsTg(false);
