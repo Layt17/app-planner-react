@@ -14,7 +14,6 @@
   position: absolute;
   top: 5%;
   left: 5%;
-  /* font-size: 5%;  */
   font-size: 15;
   font-family: Arial, sans-serif;
 }
@@ -368,7 +367,7 @@
   background-color: white;
   border-radius: 15px 15px 0 0;
   padding: 20px;
-  max-width: 500px;
+  max-width: 100%;
   width: 90%;
   box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.2);
   animation: slideUpFromBottom 0.4s ease-out;
@@ -377,9 +376,9 @@
 
 .modal-content.modal-day {
   max-width: 100%;
-  width: 100%;
+  width: 90%;
+  padding: 20px;
   border-radius: 15px 15px 0 0;
-  padding: 0;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
@@ -397,11 +396,6 @@
   margin-bottom: 15px;
   border-bottom: 2px solid #e0e0e0;
   padding-bottom: 10px;
-}
-
-.modal-content.modal-day .modal-header {
-  margin-bottom: 0;
-  padding: 20px;
   flex-shrink: 0;
 }
 
@@ -433,7 +427,6 @@
 .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
 }
 
 .modal-day .modal-body {
@@ -668,7 +661,6 @@ textarea.task-input {
 .modal-day {
   position: relative;
   width: 90%;
-  max-width: 500px;
   height: auto;
   max-height: 85vh;
   border-radius: 15px 15px 0 0;
