@@ -63,10 +63,10 @@ export const FooterC = (props: Props & object) => {
         </button>
       </div>
       <button id="leftArrowButton" onClick={handleClickLeft}>
-        🔙
+        {'<'}
       </button>
       <button id="rightArrowButton" onClick={handleClickRight}>
-        🔜
+        {'>'}
       </button>
     </div>
   );
