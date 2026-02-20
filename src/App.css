@@ -661,19 +661,23 @@ textarea.task-input {
 .sparkle {
   position: fixed;
   pointer-events: none;
-  animation: sparkleFloat 1.5s ease-out forwards;
-  font-size: 20px;
+  animation: sparkleFloat var(--duration, 2.5s) ease-out forwards;
+  font-size: 24px;
   z-index: 9999;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
 }
 
 @keyframes sparkleFloat {
   0% {
     opacity: 1;
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translate(var(--tx), var(--ty)) scale(0);
+    transform: translate(var(--tx), var(--ty)) scale(0) rotate(360deg);
   }
 }
 

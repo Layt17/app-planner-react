@@ -224,11 +224,12 @@ export const DayC = ({
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
-    const sparkleEmojis = ["✨", "🎉", "⭐", "💫", "🌟"];
+    const sparkleEmojis = ["✨", "🎉", "⭐", "💫", "🌟", "🎊", "💥"];
 
-    for (let i = 0; i < 12; i++) {
-      const angle = (Math.PI * 2 * i) / 12;
-      const distance = 100 + Math.random() * 100;
+    // Салюты из центра кнопки
+    for (let i = 0; i < 40; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 150 + Math.random() * 300;
       const tx = Math.cos(angle) * distance;
       const ty = Math.sin(angle) * distance;
 
@@ -240,10 +241,86 @@ export const DayC = ({
       sparkle.style.top = centerY + "px";
       sparkle.style.setProperty("--tx", `${tx}px`);
       sparkle.style.setProperty("--ty", `${ty}px`);
+      sparkle.style.setProperty(
+        "--duration",
+        `${2 + Math.random() * 1.5}s`
+      );
 
       document.body.appendChild(sparkle);
 
-      setTimeout(() => sparkle.remove(), 1500);
+      setTimeout(() => sparkle.remove(), 3500);
+    }
+
+    // Салюты слева (летят вправо)
+    for (let i = 0; i < 20; i++) {
+      const distance = 100 + Math.random() * 250;
+      const tx = distance; // вправо
+      const ty = (Math.random() - 0.5) * 300; // вверх/вниз
+
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
+      sparkle.textContent =
+        sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+      sparkle.style.left = "20px";
+      sparkle.style.top = window.innerHeight / 2 + "px";
+      sparkle.style.setProperty("--tx", `${tx}px`);
+      sparkle.style.setProperty("--ty", `${ty}px`);
+      sparkle.style.setProperty(
+        "--duration",
+        `${2 + Math.random() * 1.5}s`
+      );
+
+      document.body.appendChild(sparkle);
+
+      setTimeout(() => sparkle.remove(), 3500);
+    }
+
+    // Салюты справа (летят влево)
+    for (let i = 0; i < 20; i++) {
+      const distance = 100 + Math.random() * 250;
+      const tx = -distance; // влево
+      const ty = (Math.random() - 0.5) * 300; // вверх/вниз
+
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
+      sparkle.textContent =
+        sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+      sparkle.style.left = window.innerWidth - 20 + "px";
+      sparkle.style.top = window.innerHeight / 2 + "px";
+      sparkle.style.setProperty("--tx", `${tx}px`);
+      sparkle.style.setProperty("--ty", `${ty}px`);
+      sparkle.style.setProperty(
+        "--duration",
+        `${2 + Math.random() * 1.5}s`
+      );
+
+      document.body.appendChild(sparkle);
+
+      setTimeout(() => sparkle.remove(), 3500);
+    }
+
+    // Салюты сверху (летят вниз)
+    for (let i = 0; i < 25; i++) {
+      const distance = 150 + Math.random() * 250;
+      const tx = (Math.random() - 0.5) * 300; // влево/вправо
+      const ty = distance; // вниз
+
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
+      sparkle.textContent =
+        sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+      sparkle.style.left = window.innerWidth / 2 + "px";
+      sparkle.style.top = "40px";
+      sparkle.style.setProperty("--tx", `${tx}px`);
+      sparkle.style.setProperty("--ty", `${ty}px`);
+      sparkle.style.setProperty(
+        "--duration",
+        `${2 + Math.random() * 1.5}s`
+      );
+
+      document.body.appendChild(sparkle);
+
+      setTimeout(() => sparkle.remove(), 3500);
     }
   };
 
