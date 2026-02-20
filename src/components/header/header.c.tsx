@@ -64,6 +64,7 @@ export const HeaderC = ({ userInfo }: { userInfo: TgAppDataI }) => {
                   value={tempWord}
                   onChange={(e) => setTempWord(e.target.value)}
                   placeholder="Введите слово"
+                  maxLength={14}
                 />
               </div>
               <div className="form-group">
@@ -75,7 +76,7 @@ export const HeaderC = ({ userInfo }: { userInfo: TgAppDataI }) => {
                   value={tempEmoji}
                   onChange={(e) => setTempEmoji(e.target.value)}
                   placeholder="Введите эмодзи"
-                  maxLength={2}
+                  maxLength={10}
                 />
               </div>
               <div className="settings-preview">
@@ -85,13 +86,6 @@ export const HeaderC = ({ userInfo }: { userInfo: TgAppDataI }) => {
             <div className="settings-actions">
               <button className="save-task-btn" onClick={handleSave}>
                 Сохранить
-              </button>
-              <button
-                className="save-task-btn"
-                style={{ backgroundColor: "#999", marginTop: "10px" }}
-                onClick={handleClose}
-              >
-                Отмена
               </button>
             </div>
           </div>
