@@ -8,6 +8,10 @@
   background-color: #f0f0f0;
   border: 2px solid #111111;
   border-radius: 5%;
+  padding-top: max(0px, env(safe-area-inset-top));
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
 }
 
 #score {
@@ -30,6 +34,7 @@
   /* padding-left: 25px; */
   display: flex;
   align-items: center;
+  padding-top: env(safe-area-inset-top);
 }
 
 .header-content {
@@ -121,6 +126,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2);
   /* border-radius: 5%; */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 #footerDates {
   position: absolute;
@@ -168,8 +174,8 @@
 #main {
   border-radius: 10px;
   position: absolute;
-  top: 5%;
-  height: 85%;
+  top: calc(5% + env(safe-area-inset-top));
+  height: calc(85% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   width: 100%;
   font-size: 15;
   background-color: rgb(238, 240, 239);
