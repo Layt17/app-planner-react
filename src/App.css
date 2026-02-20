@@ -334,7 +334,7 @@
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   z-index: 1000;
   animation: fadeIn 0.3s ease-out;
 }
@@ -343,16 +343,12 @@
   z-index: 1499;
   background-color: rgba(0, 0, 0, 0.3);
   pointer-events: auto;
-  align-items: flex-end;
-  justify-content: center;
 }
 
 .modal-overlay.details-on-day {
   z-index: 1600;
   background-color: rgba(0, 0, 0, 0.5);
   pointer-events: auto;
-  align-items: center;
-  justify-content: center;
 }
 
 .modal-overlay.closing {
@@ -370,12 +366,13 @@
 
 .modal-content {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 15px 15px 0 0;
   padding: 20px;
-  max-width: 400px;
+  max-width: 500px;
   width: 90%;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
-  animation: slideDownFadeIn 0.4s ease-out;
+  box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUpFromBottom 0.4s ease-out;
+  position: relative;
 }
 
 .modal-content.modal-day {
@@ -390,7 +387,7 @@
 }
 
 .modal-content.slide-up {
-  animation: slideUpFadeOut 0.3s ease-in forwards;
+  animation: slideDownToBottom 0.3s ease-in forwards;
 }
 
 .modal-header {
@@ -496,15 +493,16 @@
 
 .modal-details {
   max-width: 500px;
-  animation: slideRightFadeIn 0.4s ease-out;
+  animation: slideUpFromBottom 0.4s ease-out;
   position: relative;
   z-index: 1601;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 15px 15px 0 0;
+  width: 90%;
 }
 
 .modal-details.slide-right {
-  animation: slideRightFadeOut 0.3s ease-in forwards;
+  animation: slideDownToBottom 0.3s ease-in forwards;
 }
 
 .details-body {
@@ -544,11 +542,11 @@
 }
 
 .modal-create {
-  animation: slideDownFadeIn 0.4s ease-out;
+  animation: slideUpFromBottom 0.4s ease-out;
 }
 
 .modal-create.slide-up {
-  animation: slideUpFadeOut 0.3s ease-in forwards;
+  animation: slideDownToBottom 0.3s ease-in forwards;
 }
 
 .form-group {
