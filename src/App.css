@@ -758,6 +758,28 @@ textarea.task-input {
   background-color: #3d8b40;
 }
 
+.edit-task-btn {
+  background-color: #dcdcdc;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.edit-task-btn:hover {
+  background-color: #b0c4de;
+  transform: scale(1.1);
+}
+
+.edit-task-btn:active {
+  background-color: #4a7fa5;
+  transform: scale(0.95);
+}
+
 .delete-task-btn {
   background-color: #dcdcdc;
   border: none;
