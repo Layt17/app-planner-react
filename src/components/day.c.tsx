@@ -26,6 +26,10 @@ export const DayC = ({
   const [taskMinutes, setTaskMinutes] = useState("00");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isEditing, setIsEditing] = useState(false);
+  const [editHour, setEditHour] = useState("00");
+  const [editMinutes, setEditMinutes] = useState("00");
+  const [editText, setEditText] = useState("");
 
   useEffect(() => {
     // Initialize selectedDate when component mounts
@@ -83,7 +87,43 @@ export const DayC = ({
   };
 
   const closeDetailModal = () => {
+    setIsEditing(false);
     closeModal(setClosingDetailModal, setExpandedTask, null);
+  };
+
+  const openEditMode = () => {
+    if (!expandedTask) return;
+    const timePart = expandedTask.date.split("T")[1];
+    setEditHour(timePart.substring(0, 2));
+    setEditMinutes(timePart.substring(3, 5));
+    setEditText(expandedTask.name);
+    setIsEditing(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!expandedTask || !editText.trim()) return;
+
+    const datePart = expandedTask.date.split("T")[0];
+    const [year, month, day] = datePart.split("-").map(Number);
+    const newDate = new Date(year, month - 1, day, parseInt(editHour), parseInt(editMinutes), 0, 0);
+
+    const { dateWithTz, time, date } = formatDateWithTz(newDate);
+
+    await axios.patch(
+      `${process.env.REACT_APP_BACKEND_HOST}/notifications/${expandedTask.id}`,
+      { text: editText, time, date },
+    );
+
+    state.actionsDataOnCurrentWeek = state.actionsDataOnCurrentWeek.map((t) => {
+      if (t.id === expandedTask.id) {
+        return { ...t, date: dateWithTz, name: editText };
+      }
+      return t;
+    });
+
+    updateAppState(state.actionsDataOnCurrentWeek);
+    setExpandedTask({ ...expandedTask, date: dateWithTz, name: editText });
+    setIsEditing(false);
   };
 
   const handleDeleteTask = async () => {
@@ -674,44 +714,113 @@ export const DayC = ({
             className={`modal-content modal-details ${closingDetailModal ? "slide-right" : ""}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-header">
-              <h3>
-                {expandedTask.date.split("T")[1].substring(0, 5)} - Описание
-              </h3>
-              <div
-                className={
-                  expandedTask.status === "completed"
-                    ? "completedTaskDetails"
-                    : "inProcessingTaskDetails"
-                }
-              >
-                {expandedTask.status === "completed"
-                  ? "Выполнено"
-                  : "В процессе"}
-              </div>
-              <div className="modal-header-buttons">
-                <button
-                  className="delete-task-btn"
-                  onClick={handleDeleteTask}
-                  title="Удалить задание"
-                >
-                  🗑️
-                </button>
-                <button className="modal-close" onClick={closeDetailModal}>
-                  ✕
-                </button>
-              </div>
-            </div>
-            <div className="modal-body details-body">
-              <p>{expandedTask.name}</p>
-            </div>
-            {expandedTask.status !== "completed" && (
-              <button
-                className="complete-task-btn"
-                onClick={handleCompleteTask}
-              >
-                Выполнить
-              </button>
+            {isEditing ? (
+              <>
+                <div className="modal-header">
+                  <h3>Редактировать</h3>
+                  <button className="modal-close" onClick={() => setIsEditing(false)}>
+                    ✕
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="form-group">
+                    <label>Час</label>
+                    <select
+                      value={editHour}
+                      onChange={(e) => setEditHour(e.target.value)}
+                      className="task-input"
+                      style={{ height: "40px" }}
+                    >
+                      {hours.map((h) => (
+                        <option key={h} value={h}>{h}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Минуты</label>
+                    <select
+                      value={editMinutes}
+                      onChange={(e) => setEditMinutes(e.target.value)}
+                      className="task-input"
+                      style={{ height: "40px" }}
+                    >
+                      {Array.from({ length: 12 }, (_, i) => {
+                        const minutes = String(i * 5).padStart(2, "0");
+                        return (
+                          <option key={minutes} value={minutes}>{minutes}</option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Описание задания</label>
+                    <textarea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className="task-input"
+                      rows={4}
+                    />
+                  </div>
+                  <button
+                    className="save-task-btn"
+                    onClick={handleEditSave}
+                    disabled={!editText.trim()}
+                  >
+                    Сохранить
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="modal-header">
+                  <h3>
+                    {expandedTask.date.split("T")[1].substring(0, 5)} - Описание
+                  </h3>
+                  <div
+                    className={
+                      expandedTask.status === "completed"
+                        ? "completedTaskDetails"
+                        : "inProcessingTaskDetails"
+                    }
+                  >
+                    {expandedTask.status === "completed"
+                      ? "Выполнено"
+                      : "В процессе"}
+                  </div>
+                  <div className="modal-header-buttons">
+                    {expandedTask.status !== "completed" && (
+                      <button
+                        className="edit-task-btn"
+                        onClick={openEditMode}
+                        title="Редактировать задание"
+                      >
+                        ✏️
+                      </button>
+                    )}
+                    <button
+                      className="delete-task-btn"
+                      onClick={handleDeleteTask}
+                      title="Удалить задание"
+                    >
+                      🗑️
+                    </button>
+                    <button className="modal-close" onClick={closeDetailModal}>
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                <div className="modal-body details-body">
+                  <p>{expandedTask.name}</p>
+                </div>
+                {expandedTask.status !== "completed" && (
+                  <button
+                    className="complete-task-btn"
+                    onClick={handleCompleteTask}
+                  >
+                    Выполнить
+                  </button>
+                )}
+              </>
             )}
           </div>
         </div>
