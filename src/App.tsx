@@ -125,10 +125,24 @@ function App() {
     state.userInfo = userInfoData;
     setUserInfo(userInfoData);
 
+    const chatId = state.userInfo?.chatId;
+
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_HOST}/accounts/${chatId}`)
+      .then((response) => {
+        const { favoriteWord, favoriteEmoji } = response.data as {
+          favoriteWord: string | null;
+          favoriteEmoji: string | null;
+        };
+        if (favoriteWord) localStorage.setItem("favoriteWord", favoriteWord);
+        if (favoriteEmoji) localStorage.setItem("favoriteEmoji", favoriteEmoji);
+      })
+      .catch(console.error);
+
     // Асинхронный запрос
     axios
       .get(
-        `${process.env.REACT_APP_BACKEND_HOST}/notifications/my-notifs/${state.userInfo?.chatId}`,
+        `${process.env.REACT_APP_BACKEND_HOST}/notifications/my-notifs/${chatId}`,
       )
       .then((response) => {
         const mappedNotifs: TaskI[] = (response.data as NotificationI[]).map(

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { local, state } from "../../App";
 import { TgAppDataI } from "../../interfaces/tg-web-app-data.interface";
 
@@ -14,11 +15,19 @@ export const HeaderC = ({ userInfo }: { userInfo: TgAppDataI }) => {
   const [tempEmoji, setTempEmoji] = useState(favoriteEmoji);
 
   const handleSave = () => {
-    localStorage.setItem("favoriteWord", tempWord || "молодец!");
-    localStorage.setItem("favoriteEmoji", tempEmoji || "⛵");
-    setFavoriteWord(tempWord || "молодец!");
-    setFavoriteEmoji(tempEmoji || "⛵");
+    const word = tempWord || "молодец!";
+    const emoji = tempEmoji || "⛵";
+    localStorage.setItem("favoriteWord", word);
+    localStorage.setItem("favoriteEmoji", emoji);
+    setFavoriteWord(word);
+    setFavoriteEmoji(emoji);
     setShowSettings(false);
+    axios
+      .patch(
+        `${process.env.REACT_APP_BACKEND_HOST}/accounts/${state.userInfo?.chatId}`,
+        { favoriteWord: word, favoriteEmoji: emoji },
+      )
+      .catch(console.error);
   };
 
   const handleClose = () => {
@@ -64,7 +73,7 @@ export const HeaderC = ({ userInfo }: { userInfo: TgAppDataI }) => {
                   value={tempWord}
                   onChange={(e) => setTempWord(e.target.value)}
                   placeholder="Введите слово"
-                  maxLength={14}
+                  maxLength={100}
                 />
               </div>
               <div className="form-group">
@@ -76,7 +85,7 @@ export const HeaderC = ({ userInfo }: { userInfo: TgAppDataI }) => {
                   value={tempEmoji}
                   onChange={(e) => setTempEmoji(e.target.value)}
                   placeholder="Введите эмодзи"
-                  maxLength={5}
+                  maxLength={100}
                 />
               </div>
               <div className="settings-preview">
