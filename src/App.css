@@ -288,6 +288,21 @@
   place-items: center; /* Центрирование по обеям */
   position: relative;
 }
+.hour-night {
+  background-color: #ede6f5;
+  color: #8a7aaa;
+}
+
+.hour-morning {
+  background-color: #dff0fb;
+  color: #4a7a99;
+}
+
+.hour-day {
+  background-color: #fffbe6;
+  color: #a08040;
+}
+
 .hour:active {
   border-radius: 10%;
   background-color: rgb(238, 247, 219);
@@ -299,6 +314,18 @@
 
 .today-hour {
   background-color: #f0f0f0;
+}
+
+.today-hour.hour-night {
+  background-color: #f5f0fb;
+}
+
+.today-hour.hour-morning {
+  background-color: #eef7fd;
+}
+
+.today-hour.hour-day {
+  background-color: #fffdf0;
 }
 
 .today-name {
@@ -1037,4 +1064,36 @@ textarea.task-input {
     background-color: #f0f0f0;
     box-shadow: 0 0 0 rgba(255, 215, 0, 0);
   }
+}
+
+.day-progress {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.day-progress-track {
+  fill: none;
+  stroke: #e0e0e0;
+  stroke-width: 3;
+}
+
+.day-progress-fill {
+  fill: none;
+  stroke: #4caf50;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.day-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 9px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
 }
