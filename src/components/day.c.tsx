@@ -893,7 +893,14 @@ export const DayC = ({
           </div>
         </div>
       )}
-      {showDayModal && (
+      {showDayModal && (() => {
+        const dayTasks = getDayTasks();
+        const completedCount = dayTasks.filter(t => t.status === "completed").length;
+        const totalCount = dayTasks.length;
+        const radius = 16;
+        const circumference = 2 * Math.PI * radius;
+        const progressOffset = circumference - (completedCount / totalCount) * circumference;
+        return (
         <div
           className={`modal-overlay day-modal-overlay ${closingDayModal ? "closing" : ""}`}
           onClick={closeDayModal}
@@ -904,38 +911,29 @@ export const DayC = ({
           >
             <div className="modal-header">
               <h3>{formatFullDate()}</h3>
-              {(() => {
-                const tasks = getDayTasks();
-                if (tasks.length === 0) return null;
-                const completed = tasks.filter(t => t.status === "completed").length;
-                const total = tasks.length;
-                const radius = 16;
-                const circumference = 2 * Math.PI * radius;
-                const offset = circumference - (completed / total) * circumference;
-                return (
-                  <div className="day-progress">
-                    <svg width="40" height="40" viewBox="0 0 40 40">
-                      <circle cx="20" cy="20" r={radius} className="day-progress-track" />
-                      <circle
-                        cx="20" cy="20" r={radius}
-                        className="day-progress-fill"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={offset}
-                        transform="rotate(-90 20 20)"
-                      />
-                    </svg>
-                    <span className="day-progress-text">{completed}/{total}</span>
-                  </div>
-                );
-              })()}
+              {totalCount > 0 && (
+                <div className="day-progress">
+                  <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r={radius} className="day-progress-track" />
+                    <circle
+                      cx="20" cy="20" r={radius}
+                      className="day-progress-fill"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={progressOffset}
+                      transform="rotate(-90 20 20)"
+                    />
+                  </svg>
+                  <span className="day-progress-text">{completedCount}/{totalCount}</span>
+                </div>
+              )}
               <button className="modal-close" onClick={closeDayModal}>
                 ✕
               </button>
             </div>
             <div className="modal-body">
-              {getDayTasks().length > 0 ? (
+              {totalCount > 0 ? (
                 <ul>
-                  {getDayTasks().map((action, idx) => {
+                  {dayTasks.map((action, idx) => {
                     const time = action.date.split("T")[1].substring(0, 5);
                     return (
                       <li
@@ -972,7 +970,8 @@ export const DayC = ({
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
   return dayDiv;
