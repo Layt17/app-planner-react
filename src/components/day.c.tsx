@@ -522,7 +522,13 @@ export const DayC = ({
       }
     });
 
-    let className = "hour";
+    const hourNum = parseInt(h);
+    const periodClass =
+      hourNum >= 6 && hourNum <= 9 ? "hour-morning"
+      : hourNum >= 10 && hourNum <= 19 ? "hour-day"
+      : "hour-night";
+
+    let className = `hour ${periodClass}`;
     // if (hourActions.length) {
     //   className += ' busy'
     // };
@@ -898,6 +904,30 @@ export const DayC = ({
           >
             <div className="modal-header">
               <h3>{formatFullDate()}</h3>
+              {(() => {
+                const tasks = getDayTasks();
+                if (tasks.length === 0) return null;
+                const completed = tasks.filter(t => t.status === "completed").length;
+                const total = tasks.length;
+                const radius = 16;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (completed / total) * circumference;
+                return (
+                  <div className="day-progress">
+                    <svg width="40" height="40" viewBox="0 0 40 40">
+                      <circle cx="20" cy="20" r={radius} className="day-progress-track" />
+                      <circle
+                        cx="20" cy="20" r={radius}
+                        className="day-progress-fill"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={offset}
+                        transform="rotate(-90 20 20)"
+                      />
+                    </svg>
+                    <span className="day-progress-text">{completed}/{total}</span>
+                  </div>
+                );
+              })()}
               <button className="modal-close" onClick={closeDayModal}>
                 ✕
               </button>
